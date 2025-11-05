@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+/* globals.css / index.css */
+html, body, #root {
+  margin: 0;              /* ← kills the 8px browser margin that causes the left gap */
+  padding: 0;
+  width: 100%;
+}
+* { box-sizing: border-box; }
+
+/* you already have this, keep it */
+html, body { overflow-x: hidden; }
+
+/* handy utility for full-bleed sections */
+.full-bleed {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
