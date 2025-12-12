@@ -1,5 +1,5 @@
 
-import banner from "../../assets/bannerhome.jpg";
+import banner from "../../assets/bannerhome.jpeg";
 import review from '../../assets/reviews.png'
 import CarSidebar from "../../components/CarSidebar1";
 import '@fortawesome/fontawesome-free/css/all.min.css';
