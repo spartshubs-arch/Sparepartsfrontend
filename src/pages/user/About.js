@@ -15,7 +15,7 @@ export default function AboutUs() {
   if (!data) return <p className="text-center py-10">Loading...</p>;
 
   return (
-<div className="px-4 md:px-16 pt-24 sm:pt-28 lg:pt-32 pb-16 bg-gray-50">
+<div className="px-4 md:px-16 pt-36 sm:pt-28 lg:pt-32 pb-16 bg-gray-50">
       {/* Top Icons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-center">
         {data.topIcons.map((item, i) => (
