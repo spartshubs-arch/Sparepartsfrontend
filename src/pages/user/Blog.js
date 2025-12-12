@@ -24,7 +24,7 @@ export default function BlogList() {
     );
 
   return (
-    <div className="max-w-7xl mx-auto px-0 sm:px-4 md:px-6 lg:px-8 py-10">
+<div className="max-w-7xl mx-auto px-0 sm:px-4 md:px-6 lg:px-8 pt-36 sm:pt-28 lg:pt-32 pb-10">
       <h1 className="text-3xl font-bold text-center mb-2">Our Latest Blogs</h1>
       <p className="text-center text-gray-600 mb-8">
         We have <span className="font-semibold">{blogs.length}</span> blogs for you to explore!
