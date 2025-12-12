@@ -61,7 +61,7 @@ const handleFormSubmit = async (e) => {
 
   return (
     <>
-<header className="bg-white shadow-md py-0.9 px-4 border-b-4 border-orange-500 relative">
+<header className="bg-white shadow-md py-0.9 px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
       {/* <header className="fixed top-0 left-0 w-full bg-white shadow-md px-6 border-b-4 border-orange-500 z-50"> */}
 
   <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -73,7 +73,7 @@ const handleFormSubmit = async (e) => {
         <img 
           src={logo} 
           alt="Logo" 
-className="h-24 md:h-28 lg:h-32 w-auto mr-20 cursor-pointer"/>
+className="h-24 md:h-16 lg:h-20 w-auto mr-20 cursor-pointer"/>
       </Link>
 
      {/* Request a Call Back (opens modal) */}
