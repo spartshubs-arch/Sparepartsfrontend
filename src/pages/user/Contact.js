@@ -80,7 +80,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full py-20">
       {/* Top Banner */}
       <div
         className="relative bg-cover bg-center h-[300px] flex items-center justify-center text-white"
