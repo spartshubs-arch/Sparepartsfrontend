@@ -112,7 +112,13 @@ return (
 
     {/* Top Banner Section with Text and Search */}
 <div
-  className="relative  h-screen flex flex-col justify-center items-center text-white overflow-hidden m-0 p-0"
+  className="
+    relative 
+    min-h-[calc(110vh-80px)] 
+    pt-36 md:pt-24
+    flex flex-col justify-center items-center 
+    text-white overflow-hidden m-0 p-0
+  "
 >
   {topBanner ? (
     topBanner.imageUrl.endsWith(".mp4") || topBanner.imageUrl.endsWith(".webm") ? (
