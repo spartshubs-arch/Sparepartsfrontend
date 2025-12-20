@@ -7,7 +7,7 @@ export default function BlogList() {
   const [expandedBlogId, setExpandedBlogId] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/blogs")
+    axios.get("https://sparepartshubs.com/api/blogs")
       .then(res => {
         setBlogs(res.data);
         setLoading(false);
