@@ -260,8 +260,6 @@
 
 
 
-
-
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
@@ -330,13 +328,87 @@ export default function ViewProducts() {
     }
   };
 
+  const StatusBadge = ({ status }) => (
+    <span
+      className={`inline-block px-2 py-1 rounded-full text-white text-xs capitalize ${
+        status === "sold"
+          ? "bg-red-500"
+          : status === "pending"
+          ? "bg-yellow-500"
+          : "bg-green-600"
+      }`}
+    >
+      {status}
+    </span>
+  );
+
   return (
-    <div className="p-4 sm:p-6">
-      <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+    <div className="p-3 sm:p-6">
+      <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4">
         {isAdmin ? "All Products (Admin View)" : "Your Uploaded Products"}
       </h2>
 
-      <div className="overflow-x-auto">
+      {/* ✅ MOBILE VIEW (Cards) */}
+      <div className="sm:hidden space-y-3">
+        {products.map((prod, index) => (
+          <div
+            key={prod._id}
+            className="bg-white border rounded-lg p-3 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-xs text-gray-500">#{index + 1}</p>
+                <p className="font-semibold text-sm break-words">
+                  {prod.ProductName}
+                </p>
+              </div>
+              <StatusBadge status={prod.status} />
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-gray-50 rounded p-2">
+                <p className="text-xs text-gray-500">Price</p>
+                <p className="font-medium">AED {prod.price}</p>
+              </div>
+              <div className="bg-gray-50 rounded p-2">
+                <p className="text-xs text-gray-500">Stock</p>
+                <p className="font-medium">{prod.stock}</p>
+              </div>
+
+              {isAdmin && (
+                <div className="col-span-2 bg-gray-50 rounded p-2">
+                  <p className="text-xs text-gray-500">Vendor ID</p>
+                  <p className="font-medium break-words">{prod.vendorId}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() =>
+                  navigate(isAdmin ? `/admin/edit/${prod._id}` : `/vendor/edit/${prod._id}`)
+                }
+                className="flex-1 px-3 py-2 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(prod._id)}
+                className="flex-1 px-3 py-2 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {products.length === 0 && (
+          <p className="text-gray-600 mt-4">No products found.</p>
+        )}
+      </div>
+
+      {/* ✅ TABLET/DESKTOP VIEW (Table) */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="min-w-full border text-sm text-left">
           <thead className="bg-gray-100 border-b">
             <tr>
@@ -349,41 +421,23 @@ export default function ViewProducts() {
               <th className="p-2 whitespace-nowrap">Actions</th>
             </tr>
           </thead>
-
           <tbody>
             {products.map((prod, index) => (
               <tr key={prod._id} className="border-b hover:bg-gray-50">
                 <td className="p-2 whitespace-nowrap">{index + 1}</td>
-
-                {/* ✅ Name wraps nicely on small screens */}
-                <td className="p-2 min-w-[180px] break-words">
+                <td className="p-2 min-w-[220px] break-words">
                   {prod.ProductName}
                 </td>
-
                 <td className="p-2 whitespace-nowrap">AED {prod.price}</td>
                 <td className="p-2 whitespace-nowrap">{prod.stock}</td>
-
                 <td className="p-2 whitespace-nowrap">
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-white text-xs ${
-                      prod.status === "sold"
-                        ? "bg-red-500"
-                        : prod.status === "pending"
-                        ? "bg-yellow-500"
-                        : "bg-green-600"
-                    }`}
-                  >
-                    {prod.status}
-                  </span>
+                  <StatusBadge status={prod.status} />
                 </td>
-
                 {isAdmin && (
                   <td className="p-2 whitespace-nowrap">{prod.vendorId}</td>
                 )}
-
-                {/* ✅ Buttons stack on mobile */}
                 <td className="p-2">
-                  <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex gap-2">
                     <button
                       onClick={() =>
                         navigate(
@@ -416,3 +470,4 @@ export default function ViewProducts() {
     </div>
   );
 }
+
