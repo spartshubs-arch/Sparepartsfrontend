@@ -170,8 +170,6 @@
 
 
 
-
-
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 
@@ -182,10 +180,39 @@ export default function AdminCategoryBanner() {
   const [media, setMedia] = useState(null); // Can be image or video
   const [isUpdating, setIsUpdating] = useState(null);
   const [videoWarning, setVideoWarning] = useState(false);
+  const [uploading, setUploading] = useState(false);
+const [progress, setProgress] = useState(0);
+
 
   useEffect(() => {
     fetchBanners();
   }, []);
+
+  const uploadToCloudinarySigned = async (file) => {
+  const sigRes = await axios.get("/upload/cloudinary-signature?folder=vendor_slider", {
+    headers: { Authorization: `Bearer ${sessionStorage.getItem("adminToken")}` }
+  });
+
+  const { timestamp, signature, apiKey, cloudName, folder } = sigRes.data;
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("api_key", apiKey);
+  formData.append("timestamp", timestamp);
+  formData.append("signature", signature);
+  formData.append("folder", folder);
+
+  const cloudUrl = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+
+  const res = await axios.post(cloudUrl, formData, {
+    onUploadProgress: (evt) => {
+      const percent = Math.round((evt.loaded * 100) / evt.total);
+      setProgress(percent);
+    }
+  });
+
+  return res.data.secure_url;
+};
 
   const fetchBanners = async () => {
     try {
@@ -226,38 +253,79 @@ export default function AdminCategoryBanner() {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!media && !isUpdating) return;
+
+  //   const formData = new FormData();
+  //   if (media) formData.append("image", media);  // <-- use 'image' here
+  //   formData.append("type", "category");
+  //   formData.append("title", title);
+  //   formData.append("subtitle", subtitle);
+
+  //   try {
+  //     if (isUpdating) {
+  //       await axios.put(`/upload/slider/${isUpdating}`, formData, {
+  //         headers: {
+  //           Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
+  //           "Content-Type": "multipart/form-data"
+  //         }
+  //       });
+  //     } else {
+  //       await axios.post("/upload/slider", formData, {
+  //         headers: {
+  //           Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
+  //           "Content-Type": "multipart/form-data"
+  //         }
+  //       });
+  //     }
+  //     resetForm();
+  //     fetchBanners();
+  //   } catch (err) {
+  //     alert("❌ Error: " + (err.response?.data?.message || "Something went wrong"));
+  //   }
+  // };
+
+
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!media && !isUpdating) return;
+  e.preventDefault();
+  if (!media && !isUpdating) return;
 
-    const formData = new FormData();
-    if (media) formData.append("image", media);  // <-- use 'image' here
-    formData.append("type", "category");
-    formData.append("title", title);
-    formData.append("subtitle", subtitle);
+  try {
+    setUploading(true);
+    setProgress(0);
 
-    try {
-      if (isUpdating) {
-        await axios.put(`/upload/slider/${isUpdating}`, formData, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
-            "Content-Type": "multipart/form-data"
-          }
-        });
-      } else {
-        await axios.post("/upload/slider", formData, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
-            "Content-Type": "multipart/form-data"
-          }
-        });
-      }
-      resetForm();
-      fetchBanners();
-    } catch (err) {
-      alert("❌ Error: " + (err.response?.data?.message || "Something went wrong"));
+    let imageUrl = null;
+    if (media) {
+      imageUrl = await uploadToCloudinarySigned(media);
     }
-  };
+
+    const payload = {
+      type: "category",
+      title,
+      subtitle,
+      imageUrl,
+    };
+
+    if (isUpdating) {
+      await axios.put(`/upload/slider/${isUpdating}`, payload, {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("adminToken")}` }
+      });
+    } else {
+      await axios.post("/upload/slider", payload, {
+        headers: { Authorization: `Bearer ${sessionStorage.getItem("adminToken")}` }
+      });
+    }
+
+    resetForm();
+    fetchBanners();
+  } catch (err) {
+    alert("❌ Error: " + (err.response?.data?.message || err.message || "Something went wrong"));
+  } finally {
+    setUploading(false);
+  }
+};
 
   const resetForm = () => {
     setTitle("");
@@ -345,13 +413,35 @@ export default function AdminCategoryBanner() {
           onChange={(e) => setSubtitle(e.target.value)}
         />
 
-        <button
+        {/* <button
           type="submit"
           className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
           disabled={banners.length >= 10 && !isUpdating}
         >
           {isUpdating ? "Update Banner" : "Add Category Banner"}
-        </button>
+        </button> */}
+
+
+        <button
+  type="submit"
+  className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+  disabled={uploading || (banners.length >= 5 && !isUpdating)}
+>
+  {uploading ? "Uploading..." : isUpdating ? "Update Banner" : "Add Category Banner"}
+</button>
+
+{uploading && (
+  <div className="text-sm mt-2">
+    Uploading: {progress}%
+    <div className="w-full bg-gray-200 rounded h-2 mt-2">
+      <div
+        className="bg-blue-600 h-2 rounded"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  </div>
+)}
+
         {isUpdating && (
           <button
             type="button"
