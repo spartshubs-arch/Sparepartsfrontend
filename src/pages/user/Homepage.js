@@ -140,14 +140,14 @@ return (
   )}
 
   {/* Overlay Title */}
-  <div className="relative z-10 bg-black bg-opacity-50 p-4 rounded mb-4 text-center w-11/12 max-w-6xl">
-    <h1 className="text-xl sm:text-2xl md:text-4xl font-bold">
-      Find Genuine Spare Parts for Your Vehicle
-    </h1>
-    <p className="mt-2 text-xs sm:text-sm md:text-base">
-      Reliable – Verified – Fast Delivery
-    </p>
-  </div>
+<div className="relative z-10 p-4 rounded mb-4 text-center w-11/12 max-w-6xl">
+  <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-white drop-shadow-lg">
+  Find Genuine Spare Parts for Your Vehicle
+</h1>
+<p className="mt-2 text-xs sm:text-sm md:text-base text-white drop-shadow-md">
+  Reliable – Verified – Fast Delivery
+</p>
+</div>
 
 {/* Search Form */}
 <div className="relative z-10 flex flex-col md:flex-row flex-wrap justify-center items-center gap-3 bg-white bg-opacity-80 p-4 rounded shadow-md w-11/12 max-w-6xl">
