@@ -172,12 +172,25 @@ const CheckoutForm = ({ cartItems, customerInfo, onSuccess }) => {
       </div>
 
       <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-green-600 text-white font-medium py-2 px-4 rounded-md hover:bg-green-700 transition duration-200"
-      >
-        {loading ? 'Placing Order...' : `Place Order (AED ${totalAmount.toFixed(2)})`}
-      </button>
+  type="submit"
+  disabled={loading}
+  className="w-full bg-green-600 text-white font-medium py-2 px-4 rounded-md hover:bg-green-700 transition duration-200"
+>
+  {loading ? (
+    "Placing Order..."
+  ) : (
+    <span className="inline-flex items-center gap-2">
+      Place Order (
+      <img
+        src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+        alt="AED"
+        className="w-4 h-4 object-contain"
+      />
+      {totalAmount.toFixed(2)})
+    </span>
+  )}
+</button>
+
     </form>
   );
 };
