@@ -222,9 +222,7 @@ export default function ShopPage() {
                       <span className="font-medium">{prod.condition}</span>
                     </p>
                   )}
-                  <p className="text-red-600 font-bold text-md">
-                    AED {Number(prod.price).toFixed(2)}
-                  </p>
+                
                 </div>
 
                 <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-bold transition pointer-events-none">
