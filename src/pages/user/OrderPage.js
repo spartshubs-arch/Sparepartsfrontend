@@ -105,9 +105,17 @@ export default function OrdersPage() {
           {orders.map((order, index) => (
             <div key={order._id} className="rounded-2xl shadow-lg border border-gray-200 bg-white p-6 hover:shadow-xl transition">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-                <h3 className="text-lg sm:text-xl font-semibold text-blue-800">
-                  Order #{index + 1} – <span className="text-green-600">AED {order.totalAmount}</span>
-                </h3>
+                             <h3 className="text-lg sm:text-xl font-semibold text-blue-800">
+  Order #{index + 1} –{" "}
+  <span className="text-green-600 inline-flex items-center gap-2">
+    <img
+      src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+      alt="AED"
+      className="w-4 h-4 object-contain"
+    />
+    {order.totalAmount}
+  </span>
+</h3>
                 <span className="px-3 py-1 mt-2 sm:mt-0 text-sm font-medium bg-blue-100 text-blue-700 rounded-full capitalize">
                   {order.status}
                 </span>
@@ -132,8 +140,26 @@ export default function OrdersPage() {
                       <img src={item.images[0]} alt={item.name} className="w-14 h-14 object-cover rounded" />
                       <div>
                         <p className="font-medium">{item.name}</p>
-                        <p className="text-xs text-gray-500">Qty: {item.quantity} × AED {item.price}</p>
-                        <p className="text-xs font-semibold text-gray-800">Total: AED {item.price * item.quantity}</p>
+                       <p className="text-xs text-gray-500 flex items-center gap-1">
+  Qty: {item.quantity} ×
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-3 h-3 object-contain"
+  />
+  {item.price}
+</p>
+
+<p className="text-xs font-semibold text-gray-800 flex items-center gap-1">
+  Total:
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-3 h-3 object-contain"
+  />
+  {item.price * item.quantity}
+</p>
+
                       </div>
                     </li>
                   ))}
