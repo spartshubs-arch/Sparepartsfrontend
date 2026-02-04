@@ -270,7 +270,15 @@ const handlePaymentSuccess = (paymentIntent) => {
           <h3 className="text-xl font-semibold text-green-800">Order Confirmed!</h3>
           <p>Thank you, {formData.firstName} {formData.lastName}.</p>
 <p>Order ID: <span className="font-mono">{paymentDetails.id}</span></p>
-<p>Total Paid: AED{paidAmount !== null ? paidAmount.toFixed(2) : "N/A"}</p>
+<p className="inline-flex items-center gap-1">
+  Total Paid:
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-4 h-4 object-contain"
+  />
+  {paidAmount !== null ? paidAmount.toFixed(2) : "N/A"}
+</p>
           <Link to="/" className="text-blue-600 underline mt-4 inline-block">Go back to home</Link>
         </div>
       ) : (
@@ -303,7 +311,14 @@ const handlePaymentSuccess = (paymentIntent) => {
                     />
                     <div>
                       <h3 className="text-lg font-bold">{item.name}</h3>
-<p className="text-gray-600 mb-1">AED{item.price ? item.price.toFixed(2) : "0.00"}</p>
+<p className="text-gray-600 mb-1 inline-flex items-center gap-1">
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-4 h-4 object-contain"
+  />
+  {item.price ? item.price.toFixed(2) : "0.00"}
+</p>
 
                       <p className="text-sm text-gray-500">Brand: <span className="text-black">{item.brand || 'N/A'}</span></p>
                       <p className="text-sm text-gray-500">Make: <span className="text-black">{item.make || 'N/A'}</span></p>
@@ -356,17 +371,35 @@ const handlePaymentSuccess = (paymentIntent) => {
                   <h3 className="text-lg font-semibold mt-4">Order Summary</h3>
               <ul className="list-disc list-inside text-gray-700">
   {cartItems.map((item) => (
-    <li key={item._id}>
-      {item.name} ({item.brand || 'N/A'} / {item.make || 'N/A'} / {item.model || 'N/A'} / {item.size || 'N/A'})
-      &nbsp; x {item.quantity} = AED{(item.price * item.quantity).toFixed(2)}
-    </li>
+   <li key={item._id} className="flex flex-wrap items-center gap-1">
+  <span>
+    {item.name} ({item.brand || "N/A"} / {item.make || "N/A"} / {item.model || "N/A"} / {item.size || "N/A"})
+    &nbsp; x {item.quantity} =
+  </span>
+
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-3 h-3 object-contain"
+  />
+
+  <span>{(item.price * item.quantity).toFixed(2)}</span>
+</li>
+
   ))}
 </ul>
 
 
-                  <div className="mt-2 text-lg font-semibold">
-                    Total: AED{totalAmount.toFixed(2)}
-                  </div>
+                 <div className="mt-2 text-lg font-semibold inline-flex items-center gap-2">
+  Total:
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-5 h-5 object-contain"
+  />
+  {totalAmount.toFixed(2)}
+</div>
+
 
                   <button
                     type="submit"
