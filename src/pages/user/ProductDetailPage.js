@@ -211,7 +211,7 @@ addToCart({
     >
       <ToastContainer position="top-right" autoClose={2000} />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-20">
         {/* Left: Image and Thumbnails */}
         <div className="flex flex-col gap-4 items-center">
           <div className="border rounded-lg shadow-md w-full bg-white flex justify-center">
@@ -240,7 +240,14 @@ addToCart({
         {/* Right: Product Info */}
         <div className="flex flex-col gap-4">
           <h2 className="text-3xl font-bold text-gray-900">{product.ProductName}</h2>
-          <p className="text-xl text-red-600 font-bold">AED {product.price}</p>
+<p className="text-xl text-red-600 font-bold flex items-center gap-2">
+  <img
+    src="https://kanebridgenewsme.com/application/assets/2025/03/UAE-dirham-symbol-new-1024x768-1-1200x900.jpg"
+    alt="AED"
+    className="w-5 h-5 object-contain inline-block"
+  />
+  {product.price}
+</p>
 
           {product.make && <p><strong>Make:</strong> {product.make}</p>}
           {product.model && <p><strong>Model:</strong> {product.model}</p>}
