@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import CarSidebar from "../../components/CarSidebar1";
