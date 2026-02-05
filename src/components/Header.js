@@ -1,4 +1,3 @@
-
 import { toast } from "react-toastify";
 import axios from "../api/axios"; 
 import { Link } from "react-router-dom";
@@ -134,31 +133,13 @@ className="h-24 md:h-16 lg:h-20 w-auto mr-20 cursor-pointer"/>
   onMouseEnter={handleMouseEnter}   
   onMouseLeave={handleMouseLeave}  
 >
-  <button
-    onClick={() => setShowLoginDropdown((prev) => !prev)} 
-    className="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded flex items-center gap-1"
-  >
-    <User size={16} />
-    Login
-  </button>
-
-
-          {showLoginDropdown && (
-            <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md z-10 text-sm">
-              <Link
-                to="/loginuser"
-                className="block px-4 py-2 hover:bg-orange-100 text-black"
-              >
-                Buyer Login
-              </Link>
-              <Link
-                to="/vendor/login"
-                className="block px-4 py-2 hover:bg-orange-100 text-black"
-              >
-                Seller Login
-              </Link>
-            </div>
-          )}
+ <button
+  onClick={() => navigate("/loginuser")}
+  className="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded flex items-center gap-1"
+>
+  <User size={16} />
+  Login
+</button>
         </div>
       )}
 
