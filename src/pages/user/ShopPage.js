@@ -61,9 +61,9 @@ export default function ShopPage() {
   const displayedProducts = filteredProducts; // ✅ always use filteredProducts
 
   return (
-    <div className=" pt-24 flex flex-col lg:flex-row gap-6 px-4 py-4 bg-gray-100 mt-5">
+    <div className=" pt-24 flex flex-col lg:flex-row gap-6 px-4 py-4 bg-gray-100">
       {/* Sidebar */}
-      <div className="w-full lg:w-64 flex-shrink-0 space-y-4">
+      <div className="w-full lg:w-64 flex-shrink-0 space-y-4 mt-10">
         <CarSidebar
           onModelSelect={(make, model) => {
             setFilters({
