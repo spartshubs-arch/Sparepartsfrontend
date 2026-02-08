@@ -1,3 +1,5 @@
+
+
 import { useState } from "react";
 import axios from "../api/axios";
 
@@ -98,9 +100,10 @@ const [progress, setProgress] = useState(0);
     };
 
     const res = await axios.post("/products/add", payload, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("vendorToken")}`,
-      },
+        headers: {
+    Authorization: `Bearer ${sessionStorage.getItem("vendorToken")}`,
+    "Content-Type": "application/json",
+  },
     });
 
     alert("✅ Product added!");
