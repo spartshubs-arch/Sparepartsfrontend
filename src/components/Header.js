@@ -16,7 +16,6 @@ import { useState, useRef, useEffect } from "react";
 import { useCart } from "../components/CartContext";
 
 export default function Header() {
-  const [showLoginDropdown, setShowLoginDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false); // mobile menu
   const [showCallbackForm, setShowCallbackForm] = useState(false); // popup state
@@ -26,7 +25,8 @@ export default function Header() {
     phone: "",
     reason: ""
   });
-    const navigate = useNavigate();
+
+  const navigate = useNavigate();
   const hideTimeout = useRef(null);
   const { cartItems } = useCart();
 
@@ -62,7 +62,7 @@ const handleFormSubmit = async (e) => {
 
   return (
     <>
-<header className="bg-white shadow-md py-0.9 px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
+<header className="bg-white shadow-md py-0.2 px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
       {/* <header className="fixed top-0 left-0 w-full bg-white shadow-md px-6 border-b-4 border-orange-500 z-50"> */}
 
   <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -135,13 +135,43 @@ className="h-24 md:h-16 lg:h-20 w-auto mr-20 cursor-pointer"/>
   onMouseEnter={handleMouseEnter}   
   onMouseLeave={handleMouseLeave}  
 >
- <button
+  {/* <button
+    onClick={() => setShowLoginDropdown((prev) => !prev)} 
+    className="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded flex items-center gap-1"
+  >
+    <User size={16} />
+    Login
+  </button>
+
+
+          {showLoginDropdown && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-md z-10 text-sm">
+              <Link
+                to="/loginuser"
+                className="block px-4 py-2 hover:bg-orange-100 text-black"
+              >
+                Buyer Login
+              </Link>
+              <Link
+                to="/vendor/login"
+                className="block px-4 py-2 hover:bg-orange-100 text-black"
+              >
+                Seller Login
+              </Link>
+            </div>
+          )} */}
+          
+
+
+<button
   onClick={() => navigate("/loginuser")}
   className="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded flex items-center gap-1"
 >
   <User size={16} />
   Login
 </button>
+
+
         </div>
       )}
 
@@ -231,3 +261,4 @@ className="h-24 md:h-16 lg:h-20 w-auto mr-20 cursor-pointer"/>
     </>
   );
 }
+
