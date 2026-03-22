@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import logo from "../logo/sparepartslogo.jpg";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../components/CartContext";
 
 export default function Header() {
