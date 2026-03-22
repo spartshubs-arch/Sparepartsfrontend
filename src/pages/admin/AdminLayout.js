@@ -6,16 +6,20 @@ const AdminLayout = () => {
   const token = sessionStorage.getItem("adminToken");
 
   if (!token) {
-  
     return <Navigate to="/admin/login" />;
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="relative min-h-screen bg-gray-100">
+      
+      {/* Sidebar */}
       <AdminSidebar />
-      <main className="flex-1 p-6">
+
+      {/* Main Content */}
+      <main className="p-6 md:ml-64">
         <Outlet />
       </main>
+
     </div>
   );
 };
