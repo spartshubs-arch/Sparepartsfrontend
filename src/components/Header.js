@@ -26,7 +26,7 @@ export default function Header() {
     phone: "",
     reason: ""
   });
-
+    const navigate = useNavigate();
   const hideTimeout = useRef(null);
   const { cartItems } = useCart();
 
