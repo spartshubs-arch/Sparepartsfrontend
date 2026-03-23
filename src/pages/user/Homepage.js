@@ -333,7 +333,7 @@ return (
       </div>
 
 {/* Premium Brands Scrolling Section */}
-<div className="bg-white py-12 px-4 mt-20 overflow-hidden">
+<div className="bg-white py-12 px-4 mt-15 overflow-hidden">
  
     
     <h2 className="text-3xl font-bold mb-8 text-center">
@@ -435,7 +435,7 @@ return (
 
 
       {/* About Us Concept Section Based on Image */}
-<div className="w-full bg-white mt-28 px-4 md:px-12 lg:px-24 py-12">
+<div className="w-full bg-white mt-15 px-4 md:px-12 lg:px-24 py-12">
   <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
     
     {/* Left: Image with Badge */}
