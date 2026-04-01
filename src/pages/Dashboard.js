@@ -1,269 +1,191 @@
 
-
-// src/pages/Dashboard.js
-// import { useEffect, useState } from "react";
-// import axios from "../api/axios";
-
-// export default function Dashboard() {
-//   const [stats, setStats] = useState({
-//     total: 0,
-//     pending: 0,
-//     approved: 0,
-//     sold: 0,
-//   });
-//   const [profile, setProfile] = useState(null);
-
-//   // ✅ Grab vendor + token from session
-//   const vendor = JSON.parse(sessionStorage.getItem("vendorInfo"));
-//   const token = sessionStorage.getItem("vendorToken");
-
-//   // ✅ Normalize vendorId (backend sometimes returns `_id`, sometimes `id`)
-//   const vendorId = vendor?._id || vendor?.id;
-
-//   // 🔹 Fetch product stats
-//   useEffect(() => {
-//     if (!vendorId) return;
-
-//     axios
-//       .get(`/products/all?vendorId=${vendorId}`)
-//       .then((res) => {
-//         const all = res.data;
-//         const pending = all.filter((p) => p.status === "pending").length;
-//         const approved = all.filter((p) => p.status === "approved").length;
-//         const sold = all.filter((p) => p.status === "sold").length;
-
-//         setStats({
-//           total: all.length,
-//           pending,
-//           approved,
-//           sold,
-//         });
-//       })
-//       .catch((err) => {
-//         console.error("❌ Error fetching dashboard stats", err);
-//       });
-//   }, [vendorId]);
-
-//   // 🔹 Fetch vendor profile (fresh data from backend)
-//   useEffect(() => {
-//     if (!token) return;
-
-//     axios
-//       .get("/vendor/profile", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       })
-//       .then((res) => {
-//         setProfile(res.data);
-//         sessionStorage.setItem("vendorInfo", JSON.stringify(res.data)); // keep updated
-//       })
-//       .catch((err) => console.error("❌ Error fetching vendor profile", err));
-//   }, [token]);
-
-//   return (
-//     <div className="p-6">
-//       <h2 className="text-2xl font-bold mb-6">Vendor Dashboard</h2>
-
-//       {/* ✅ Product Stats */}
-//       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-//         <StatBox label="Total Products" value={stats.total} color="bg-blue-600" />
-//         <StatBox label="Pending" value={stats.pending} color="bg-yellow-500" />
-//         <StatBox label="Approved" value={stats.approved} color="bg-green-600" />
-//         <StatBox label="Sold" value={stats.sold} color="bg-red-600" />
-//       </div>
-
-//       {/* ✅ Vendor Profile Info */}
-//       {profile && (
-//         <div className="bg-gray-100 p-4 rounded text-sm flex gap-6">
-//           <div>
-//             <p><strong>Name:</strong> {profile.firstName} {profile.lastName}</p>
-//             <p><strong>Trade Name:</strong> {profile.tradeName}</p>
-//             <p><strong>License Number:</strong> {profile.licenseNumber}</p>
-//             <p><strong>TRN Number:</strong> {profile.trnNumber}</p>
-//             <p><strong>Business Type:</strong> {profile.businessType}</p>
-//             <p><strong>Vendor ID:</strong> {profile.idNumber}</p>
-//             <p><strong>Contact:</strong> {profile.contact}</p>
-//             <p><strong>Address:</strong> {profile.address}, {profile.city}, {profile.area}</p>
-//             <p>
-//               <strong>Status:</strong>{" "}
-//               {profile.isApproved ? (
-//                 <span className="text-green-600 font-semibold">Approved</span>
-//               ) : (
-//                 <span className="text-yellow-600 font-semibold">Pending Approval</span>
-//               )}
-//             </p>
-//           </div>
-
-//           {/* ✅ Images */}
-//           <div className="flex flex-col gap-2">
-//             {profile.idCardImage && (
-//               <img src={profile.idCardImage} alt="Vendor ID" className="w-40 rounded shadow" />
-//             )}
-//             {profile.licenseImage && (
-//               <img src={profile.licenseImage} alt="License" className="w-40 rounded shadow" />
-//             )}
-//             {profile.passportImage && (
-//               <img src={profile.passportImage} alt="Passport" className="w-40 rounded shadow" />
-//             )}
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// function StatBox({ label, value, color }) {
-//   return (
-//     <div
-//       className={`p-4 rounded shadow text-white ${color} flex flex-col items-center justify-center`}
-//     >
-//       <p className="text-xl font-semibold">{value}</p>
-//       <p className="text-sm mt-1">{label}</p>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
 import { useEffect, useState } from "react";
 import axios from "../api/axios";
+import {
+  FaBoxOpen, FaClock, FaCheckCircle, FaTimesCircle,
+  FaBell, FaTimes, FaCheckCircle as FaCheck,
+} from "react-icons/fa";
 
 export default function Dashboard() {
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    approved: 0,
-    sold: 0,
-  });
-  const [profile, setProfile] = useState(null);
+  const [stats,         setStats]         = useState({ total: 0, pending: 0, approved: 0, sold: 0 });
+  const [profile,       setProfile]       = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotif,     setShowNotif]     = useState(false);
 
-  // ✅ Grab vendor + token from session
-  const vendor = JSON.parse(sessionStorage.getItem("vendorInfo"));
-  const token = sessionStorage.getItem("vendorToken");
-
-  // ✅ Normalize vendorId (backend sometimes returns `_id`, sometimes `id`)
+  const vendor   = JSON.parse(sessionStorage.getItem("vendorInfo") || "{}");
+  const token    = sessionStorage.getItem("vendorToken");
   const vendorId = vendor?._id || vendor?.id;
 
-  // 🔹 Fetch product stats
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // ── Product stats ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!vendorId) return;
-
-    axios
-      .get(`/products/all?vendorId=${vendorId}`)
+    axios.get(`/products/all?vendorId=${vendorId}`)
       .then((res) => {
         const all = res.data;
-        const pending = all.filter((p) => p.status === "pending").length;
-        const approved = all.filter((p) => p.status === "approved").length;
-        const sold = all.filter((p) => p.status === "sold").length;
-
         setStats({
-          total: all.length,
-          pending,
-          approved,
-          sold,
+          total:    all.length,
+          pending:  all.filter((p) => p.status === "pending").length,
+          approved: all.filter((p) => p.status === "approved").length,
+          sold:     all.filter((p) => p.status === "sold").length,
         });
       })
-      .catch((err) => {
-        console.error("❌ Error fetching dashboard stats", err);
-      });
+      .catch(console.error);
   }, [vendorId]);
 
-  // 🔹 Fetch vendor profile (fresh data from backend)
+  // ── Vendor profile ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!token) return;
-
-    axios
-      .get("/vendor/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    axios.get("/vendor/profile", { headers })
       .then((res) => {
         setProfile(res.data);
-        sessionStorage.setItem("vendorInfo", JSON.stringify(res.data)); // keep updated
+        sessionStorage.setItem("vendorInfo", JSON.stringify(res.data));
       })
-      .catch((err) => console.error("❌ Error fetching vendor profile", err));
+      .catch(console.error);
   }, [token]);
 
-  return (
-    <div className="p-4 sm:p-6">
-      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
-        Vendor Dashboard
-      </h2>
+  // ── Notifications ──────────────────────────────────────────────────────
+  const fetchNotifications = () => {
+    if (!token) return;
+    axios.get("/notifications/vendor", { headers })
+      .then((r) => setNotifications(r.data))
+      .catch(console.error);
+  };
 
-      {/* ✅ Product Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-        <StatBox label="Total Products" value={stats.total} color="bg-blue-600" />
-        <StatBox label="Pending" value={stats.pending} color="bg-yellow-500" />
-        <StatBox label="Approved" value={stats.approved} color="bg-green-600" />
-        <StatBox label="Sold" value={stats.sold} color="bg-red-600" />
+  useEffect(() => { fetchNotifications(); }, [token]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
+  const markRead = async (id) => {
+    try {
+      await axios.put(`/notifications/${id}/read`, {}, { headers });
+      setNotifications((prev) =>
+        prev.map((n) => n._id === id ? { ...n, isRead: true } : n)
+      );
+    } catch { /* silent */ }
+  };
+
+  const statCards = [
+    { label: "Total Products", value: stats.total,    color: "from-blue-500   to-blue-700",   icon: <FaBoxOpen size={24} /> },
+    { label: "Pending",        value: stats.pending,  color: "from-yellow-400 to-yellow-600", icon: <FaClock size={24} /> },
+    { label: "Approved",       value: stats.approved, color: "from-green-500  to-green-700",  icon: <FaCheckCircle size={24} /> },
+    { label: "Sold",           value: stats.sold,     color: "from-red-500    to-red-700",    icon: <FaTimesCircle size={24} /> },
+  ];
+
+  return (
+    <div className="p-6 min-h-screen bg-gray-50">
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-3xl font-extrabold text-gray-800">Vendor Dashboard</h2>
+          <p className="text-gray-400 text-sm mt-1">
+            Welcome, <span className="text-green-600 font-semibold">{profile?.tradeName || vendor?.tradeName || "Vendor"}</span>
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowNotif(!showNotif)}
+          className="relative bg-white shadow border border-gray-200 rounded-xl p-3 hover:bg-gray-50 transition"
+        >
+          <FaBell size={20} className="text-gray-600" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+              {unreadCount}
+            </span>
+          )}
+        </button>
       </div>
 
-      {/* ✅ Vendor Profile Info */}
-      {profile && (
-        <div className="bg-gray-100 p-3 sm:p-4 rounded text-sm flex flex-col lg:flex-row gap-4 lg:gap-6">
-          {/* ✅ Text */}
-          <div className="flex-1 min-w-0">
-            <p className="break-words">
-              <strong>Name:</strong> {profile.firstName} {profile.lastName}
-            </p>
-            <p className="break-words">
-              <strong>Trade Name:</strong> {profile.tradeName}
-            </p>
-            <p className="break-words">
-              <strong>License Number:</strong> {profile.licenseNumber}
-            </p>
-            <p className="break-words">
-              <strong>TRN Number:</strong> {profile.trnNumber}
-            </p>
-            <p className="break-words">
-              <strong>Business Type:</strong> {profile.businessType}
-            </p>
-            <p className="break-words">
-              <strong>Vendor ID:</strong> {profile.idNumber}
-            </p>
-            <p className="break-words">
-              <strong>Contact:</strong> {profile.contact}
-            </p>
-            <p className="break-words">
-              <strong>Address:</strong> {profile.address}, {profile.city}, {profile.area}
-            </p>
-            <p className="break-words">
-              <strong>Status:</strong>{" "}
-              {profile.isApproved ? (
-                <span className="text-green-600 font-semibold">Approved</span>
-              ) : (
-                <span className="text-yellow-600 font-semibold">
-                  Pending Approval
-                </span>
+      {/* ── Notifications Panel ──────────────────────────────────────────── */}
+      {showNotif && (
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mb-8 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+            <h3 className="font-bold text-gray-800 flex items-center gap-2">
+              <FaBell className="text-yellow-500" /> Notifications
+              {unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{unreadCount} new</span>
               )}
-            </p>
+            </h3>
+            <button onClick={() => setShowNotif(false)} className="text-gray-400 hover:text-gray-700">
+              <FaTimes />
+            </button>
           </div>
 
-          {/* ✅ Images */}
-          <div className="w-full lg:w-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-3">
-              {profile.idCardImage && (
-                <img
-                  src={profile.idCardImage}
-                  alt="Vendor ID"
-                  className="w-full sm:w-40 lg:w-44 h-28 sm:h-32 object-cover rounded shadow"
-                />
-              )}
-              {profile.licenseImage && (
-                <img
-                  src={profile.licenseImage}
-                  alt="License"
-                  className="w-full sm:w-40 lg:w-44 h-28 sm:h-32 object-cover rounded shadow"
-                />
-              )}
-              {profile.passportImage && (
-                <img
-                  src={profile.passportImage}
-                  alt="Passport"
-                  className="w-full sm:w-40 lg:w-44 h-28 sm:h-32 object-cover rounded shadow"
-                />
-              )}
+          <div className="divide-y max-h-80 overflow-y-auto">
+            {notifications.length === 0 ? (
+              <p className="text-center text-gray-400 py-8 text-sm">No notifications yet.</p>
+            ) : (
+              notifications.map((n) => (
+                <div
+                  key={n._id}
+                  className={`px-6 py-4 flex items-start gap-3 ${n.isRead ? "bg-white" : "bg-green-50"}`}
+                >
+                  <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0
+                    ${n.isRead ? "bg-gray-300" : "bg-green-500"}`}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-800 text-sm">{n.subject}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">{n.message}</p>
+                    <p className="text-gray-400 text-xs mt-1">{new Date(n.createdAt).toLocaleString()}</p>
+                  </div>
+                  {!n.isRead && (
+                    <button
+                      onClick={() => markRead(n._id)}
+                      className="flex-shrink-0 text-green-500 hover:text-green-700"
+                      title="Mark as read"
+                    >
+                      <FaCheck size={16} />
+                    </button>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Stat Cards ──────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+        {statCards.map(({ label, value, color, icon }) => (
+          <div key={label} className={`bg-gradient-to-br ${color} text-white rounded-2xl p-5 shadow flex items-center gap-4`}>
+            <div className="bg-white bg-opacity-20 p-2 rounded-xl">{icon}</div>
+            <div>
+              <p className="text-3xl font-extrabold">{value}</p>
+              <p className="text-xs opacity-90 mt-0.5">{label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Profile Card ────────────────────────────────────────────────── */}
+      {profile && (
+        <div className="bg-white rounded-2xl shadow p-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Business Profile</h3>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm">
+              <ProfileRow label="Full Name"      value={`${profile.firstName} ${profile.lastName}`} />
+              <ProfileRow label="Trade Name"     value={profile.tradeName} />
+              <ProfileRow label="License No."    value={profile.licenseNumber} />
+              <ProfileRow label="TRN Number"     value={profile.trnNumber} />
+              <ProfileRow label="Business Type"  value={profile.businessType} />
+              <ProfileRow label="Vendor ID"      value={profile.idNumber} />
+              <ProfileRow label="Contact"        value={profile.contact} />
+              <ProfileRow label="Address"        value={`${profile.address}, ${profile.city}, ${profile.area}`} />
+              <div className="sm:col-span-2">
+                <span className="text-gray-500 font-medium">Status: </span>
+                {profile.isApproved ? (
+                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">✅ Approved</span>
+                ) : (
+                  <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold">⏳ Pending Approval</span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-row md:flex-col gap-3">
+              {profile.idCardImage   && <DocImage src={profile.idCardImage}   alt="ID Card" />}
+              {profile.licenseImage  && <DocImage src={profile.licenseImage}  alt="License" />}
+              {profile.passportImage && <DocImage src={profile.passportImage} alt="Passport" />}
             </div>
           </div>
         </div>
@@ -272,13 +194,20 @@ export default function Dashboard() {
   );
 }
 
-function StatBox({ label, value, color }) {
+function ProfileRow({ label, value }) {
   return (
-    <div
-      className={`p-3 sm:p-4 rounded shadow text-white ${color} flex flex-col items-center justify-center`}
-    >
-      <p className="text-lg sm:text-xl font-semibold">{value}</p>
-      <p className="text-xs sm:text-sm mt-1 text-center">{label}</p>
+    <div>
+      <span className="text-gray-400 text-xs uppercase tracking-wide">{label}</span>
+      <p className="text-gray-800 font-medium">{value || "—"}</p>
+    </div>
+  );
+}
+
+function DocImage({ src, alt }) {
+  return (
+    <div className="text-center">
+      <img src={src} alt={alt} className="w-32 rounded-lg shadow border" />
+      <p className="text-xs text-gray-400 mt-1">{alt}</p>
     </div>
   );
 }
