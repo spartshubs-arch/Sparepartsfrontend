@@ -1,27 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "../../api/axios";
-import { FaCheckCircle, FaEdit, FaTimes, FaTrash } from "react-icons/fa"; // ← add FaTrash
+import { FaCheckCircle, FaEdit, FaTimes, FaTrash } from "react-icons/fa";
 
-const ALL_PAGES = [   
-  { key: "dashboard",        label: "Dashboard" },
-  { key: "vendors",          label: "Vendors" },
-  { key: "view-products",    label: "Products" },
-  { key: "users",            label: "Users" },
-  { key: "sliders",          label: "Featured Sliders" },
+const ALL_PAGES = [
+  { key: "dashboard", label: "Dashboard" },
+  { key: "vendors", label: "Vendors" },
+  { key: "view-products", label: "Products" },
+  { key: "users", label: "Users" },
+  { key: "sliders", label: "Featured Sliders" },
   { key: "category-banners", label: "Banners" },
-  { key: "add-category",     label: "Add Category" }, 
+  { key: "add-category", label: "Add Category" },
   { key: "view-car-details", label: "Car Details" },
-  { key: "orders",           label: "Orders" },
-  { key: "callbackrequest",  label: "Callback Requests" },
-  { key: "blogpage",         label: "Blog" },
-  { key: "contact",          label: "Contact" },
-  { key: "messages",         label: "Messages" },
-  { key: "about-us",         label: "About Us" },
-  { key: "faq",              label: "FAQ" },
+  { key: "orders", label: "Orders" },
+  { key: "callbackrequest", label: "Callback Requests" },
+  { key: "blogpage", label: "Blog" },
+  { key: "contact", label: "Contact" },
+  { key: "messages", label: "Messages" },
+  { key: "about-us", label: "About Us" },
+  { key: "faq", label: "FAQ" },
 ];
 
 function PermissionModal({ admin, onClose, onSave }) {
-  const [accessType,    setAccessType]    = useState(admin?.accessType || "all");
+  const [accessType, setAccessType] = useState(admin?.accessType || "all");
   const [selectedPages, setSelectedPages] = useState(admin?.allowedPages || []);
 
   const togglePage = (key) =>
@@ -30,7 +30,7 @@ function PermissionModal({ admin, onClose, onSave }) {
     );
 
   const selectAll = () => setSelectedPages(ALL_PAGES.map((p) => p.key));
-  const clearAll  = () => setSelectedPages([]);
+  const clearAll = () => setSelectedPages([]);
 
   const handleSave = () => {
     if (accessType === "selected" && selectedPages.length === 0) {
@@ -45,9 +45,13 @@ function PermissionModal({ admin, onClose, onSave }) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold text-gray-800">
-            Set Permissions — <span className="text-blue-600">{admin?.username}</span>
+            Set Permissions —{" "}
+            <span className="text-blue-600">{admin?.username}</span>
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700"
+          >
             <FaTimes size={18} />
           </button>
         </div>
@@ -56,7 +60,10 @@ function PermissionModal({ admin, onClose, onSave }) {
           <p className="font-semibold text-gray-700 mb-3">Access Type</p>
           <div className="flex gap-4 mb-5">
             {["all", "selected"].map((type) => (
-              <label key={type} className="flex items-center gap-2 cursor-pointer">
+              <label
+                key={type}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="accessType"
@@ -77,18 +84,30 @@ function PermissionModal({ admin, onClose, onSave }) {
               <div className="flex justify-between items-center mb-3">
                 <p className="font-semibold text-gray-700">Choose Pages</p>
                 <div className="flex gap-3">
-                  <button onClick={selectAll} className="text-xs text-blue-600 hover:underline">Select All</button>
-                  <button onClick={clearAll}  className="text-xs text-red-500 hover:underline">Clear</button>
+                  <button
+                    onClick={selectAll}
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    Select All
+                  </button>
+                  <button
+                    onClick={clearAll}
+                    className="text-xs text-red-500 hover:underline"
+                  >
+                    Clear
+                  </button>
                 </div>
               </div>
+
               <div className="grid grid-cols-2 gap-2">
                 {ALL_PAGES.map(({ key, label }) => (
                   <label
                     key={key}
-                    className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition
-                      ${selectedPages.includes(key)
+                    className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${
+                      selectedPages.includes(key)
                         ? "bg-blue-50 border-blue-400 text-blue-700"
-                        : "border-gray-200 hover:bg-gray-50 text-gray-600"}`}
+                        : "border-gray-200 hover:bg-gray-50 text-gray-600"
+                    }`}
                   >
                     <input
                       type="checkbox"
@@ -100,6 +119,7 @@ function PermissionModal({ admin, onClose, onSave }) {
                   </label>
                 ))}
               </div>
+
               <p className="text-xs text-gray-400 mt-2">
                 {selectedPages.length} / {ALL_PAGES.length} pages selected
               </p>
@@ -108,7 +128,10 @@ function PermissionModal({ admin, onClose, onSave }) {
         </div>
 
         <div className="px-6 py-4 border-t flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-50 text-sm">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-50 text-sm"
+          >
             Cancel
           </button>
           <button
@@ -124,27 +147,33 @@ function PermissionModal({ admin, onClose, onSave }) {
 }
 
 export default function AdminApprovalPage() {
-  const [stats,  setStats]  = useState({});
+  const [stats, setStats] = useState({});
   const [admins, setAdmins] = useState([]);
-  const [modal,  setModal]  = useState(null);
+  const [modal, setModal] = useState(null);
 
-  const token   = localStorage.getItem("superAdminToken");
-  const headers = { Authorization: `Bearer ${token}` };
+  const token = localStorage.getItem("superAdminToken");
 
-  const fetchData = async () => {
+  const headers = useMemo(
+    () => ({ Authorization: `Bearer ${token}` }),
+    [token]
+  );
+
+  const fetchData = useCallback(async () => {
     try {
       const [sRes, aRes] = await Promise.all([
         axios.get("/superadmin/admin-stats", { headers }),
-        axios.get("/superadmin/admins",      { headers }),
+        axios.get("/superadmin/admins", { headers }),
       ]);
       setStats(sRes.data);
       setAdmins(aRes.data);
     } catch {
       alert("Failed to load data");
     }
-  };
+  }, [headers]);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSave = async ({ accessType, allowedPages }) => {
     try {
@@ -170,7 +199,6 @@ export default function AdminApprovalPage() {
     }
   };
 
-  // ── DELETE HANDLER ──────────────────────────────────────────────────────────
   const handleDelete = async (admin) => {
     const confirmed = window.confirm(
       `⚠️ Are you sure you want to delete admin "${admin.username}"?\nThis action cannot be undone.`
@@ -185,18 +213,35 @@ export default function AdminApprovalPage() {
       alert(err.response?.data?.message || "❌ Failed to delete admin");
     }
   };
-  // ───────────────────────────────────────────────────────────────────────────
 
   const statCards = [
-    { label: "Total",     value: stats.totalAdmins   ?? 0, bg: "bg-blue-100   text-blue-700"   },
-    { label: "Remaining", value: stats.remainingSlots ?? 0, bg: "bg-purple-100 text-purple-700" },
-    { label: "Approved",  value: stats.approvedAdmins ?? 0, bg: "bg-green-100  text-green-700"  },
-    { label: "Pending",   value: stats.pendingAdmins  ?? 0, bg: "bg-yellow-100 text-yellow-700" },
+    {
+      label: "Total",
+      value: stats.totalAdmins ?? 0,
+      bg: "bg-blue-100 text-blue-700",
+    },
+    {
+      label: "Remaining",
+      value: stats.remainingSlots ?? 0,
+      bg: "bg-purple-100 text-purple-700",
+    },
+    {
+      label: "Approved",
+      value: stats.approvedAdmins ?? 0,
+      bg: "bg-green-100 text-green-700",
+    },
+    {
+      label: "Pending",
+      value: stats.pendingAdmins ?? 0,
+      bg: "bg-yellow-100 text-yellow-700",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">🛡️ Admin Approval &amp; Permissions</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        🛡️ Admin Approval &amp; Permissions
+      </h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {statCards.map(({ label, value, bg }) => (
@@ -223,41 +268,56 @@ export default function AdminApprovalPage() {
           <tbody>
             {admins.map((admin) => (
               <tr key={admin._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 font-semibold text-gray-800">{admin.username}</td>
-                <td className="px-4 py-3 text-gray-500">{admin.registeredBy}</td>
+                <td className="px-4 py-3 font-semibold text-gray-800">
+                  {admin.username}
+                </td>
+                <td className="px-4 py-3 text-gray-500">
+                  {admin.registeredBy}
+                </td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-bold
-                    ${admin.isApproved ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-bold ${
+                      admin.isApproved
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
                     {admin.isApproved ? "✅ Approved" : "⏳ Pending"}
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   {admin.isApproved ? (
-                    <span className={`px-2 py-1 rounded-full text-xs font-bold
-                      ${admin.accessType === "all"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-orange-100 text-orange-700"}`}>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-bold ${
+                        admin.accessType === "all"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-orange-100 text-orange-700"
+                      }`}
+                    >
                       {admin.accessType === "all" ? "🌐 All" : "🔒 Selected"}
                     </span>
-                  ) : "—"}
+                  ) : (
+                    "—"
+                  )}
                 </td>
                 <td className="px-4 py-3 text-gray-500 text-xs max-w-xs">
-                  {admin.isApproved
-                    ? admin.accessType === "all"
-                      ? <span className="text-blue-500">All Pages</span>
-                      : admin.allowedPages?.length > 0
-                        ? admin.allowedPages.join(", ")
-                        : "None"
-                    : "—"}
+                  {admin.isApproved ? (
+                    admin.accessType === "all" ? (
+                      <span className="text-blue-500">All Pages</span>
+                    ) : admin.allowedPages?.length > 0 ? (
+                      admin.allowedPages.join(", ")
+                    ) : (
+                      "None"
+                    )
+                  ) : (
+                    "—"
+                  )}
                 </td>
                 <td className="px-4 py-3 text-gray-400">
                   {new Date(admin.createdAt).toLocaleDateString()}
                 </td>
-
-                {/* ── ACTIONS COLUMN ───────────────────────────────────────── */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    {/* Approve / Edit Access */}
                     {!admin.isApproved ? (
                       <button
                         onClick={() => setModal({ admin, mode: "approve" })}
@@ -274,7 +334,6 @@ export default function AdminApprovalPage() {
                       </button>
                     )}
 
-                    {/* Delete button — always visible */}
                     <button
                       onClick={() => handleDelete(admin)}
                       className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-xs font-semibold"
@@ -283,8 +342,6 @@ export default function AdminApprovalPage() {
                     </button>
                   </div>
                 </td>
-                {/* ─────────────────────────────────────────────────────────── */}
-
               </tr>
             ))}
           </tbody>
