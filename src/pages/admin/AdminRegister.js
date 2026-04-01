@@ -12,7 +12,7 @@ export default function AdminRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) => { 
     setForm({ ...form, [e.target.name]: e.target.value }); 
   };
 
