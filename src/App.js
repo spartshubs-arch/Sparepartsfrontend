@@ -57,7 +57,7 @@ import VendorProfile from './pages/Profile';
 import AdminVendorProfile from './pages/admin/AdminVendorProfile';
 import SuperAdminLogin from './pages/superAdmin/superAdminLogin';
 import SuperAdminDashboard from './pages/superAdmin/superAdminDashboard';
-import SuperAdminApproval from './pages/superAdmin/superAdminApproval';
+import SuperAdminApproval from './pages/superAdmin/superAdminApproval'; 
 
 // ── ADD THIS IMPORT ───────────────────────────────────────────────────────────
 import AdminProtectedRoute from './components/AdminProtectedRoute';
