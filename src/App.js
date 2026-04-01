@@ -14,7 +14,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminVendors from "./pages/admin/AdminVendors";
 import AdminSliderManager from './pages/admin/AdminFeaturedProducts';
 import AdminHomeTopBanner from './pages/admin/AdminHomeTopBanner';
-import AdminViewProducts from './pages/admin/AdminViewProduct';
+import AdminViewProducts from './pages/admin/AdminViewProduct'; 
 import AdminEditProduct from './pages/admin/AdminEditProduct';
 import AdminRegister from "./pages/admin/AdminRegister";
 import AdminCategory from './pages/admin/AdminAddCarDetails';
