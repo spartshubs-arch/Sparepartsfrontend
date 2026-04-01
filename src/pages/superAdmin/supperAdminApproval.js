@@ -10,7 +10,7 @@ const ALL_PAGES = [
   { key: "users",            label: "Users" },
   { key: "sliders",          label: "Featured Sliders" },
   { key: "category-banners", label: "Banners" },
-  { key: "add-category",     label: "Add Category" },
+  { key: "add-category",     label: "Add Category" }, 
   { key: "view-car-details", label: "Car Details" },
   { key: "orders",           label: "Orders" },
   { key: "callbackrequest",  label: "Callback Requests" },
