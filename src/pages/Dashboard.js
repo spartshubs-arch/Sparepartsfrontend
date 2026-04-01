@@ -1,34 +1,48 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "../api/axios";
 import {
-  FaBoxOpen, FaClock, FaCheckCircle, FaTimesCircle,
-  FaBell, FaTimes, FaCheckCircle as FaCheck,
+  FaBoxOpen,
+  FaClock,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaBell,
+  FaTimes,
+  FaCheckCircle as FaCheck,
 } from "react-icons/fa";
 
 export default function Dashboard() {
-  const [stats,         setStats]         = useState({ total: 0, pending: 0, approved: 0, sold: 0 });
-  const [profile,       setProfile]       = useState(null);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    sold: 0,
+  });
+  const [profile, setProfile] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const [showNotif,     setShowNotif]     = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
 
-  const vendor   = JSON.parse(sessionStorage.getItem("vendorInfo") || "{}");
-  const token    = sessionStorage.getItem("vendorToken");
+  const vendor = JSON.parse(sessionStorage.getItem("vendorInfo") || "{}");
+  const token = sessionStorage.getItem("vendorToken");
   const vendorId = vendor?._id || vendor?.id;
 
-  const headers = { Authorization: `Bearer ${token}` };
+  const headers = useMemo(
+    () => ({ Authorization: `Bearer ${token}` }),
+    [token]
+  );
 
   // ── Product stats ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!vendorId) return;
-    axios.get(`/products/all?vendorId=${vendorId}`)
+
+    axios
+      .get(`/products/all?vendorId=${vendorId}`)
       .then((res) => {
         const all = res.data;
         setStats({
-          total:    all.length,
-          pending:  all.filter((p) => p.status === "pending").length,
+          total: all.length,
+          pending: all.filter((p) => p.status === "pending").length,
           approved: all.filter((p) => p.status === "approved").length,
-          sold:     all.filter((p) => p.status === "sold").length,
+          sold: all.filter((p) => p.status === "sold").length,
         });
       })
       .catch(console.error);
@@ -37,23 +51,29 @@ export default function Dashboard() {
   // ── Vendor profile ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!token) return;
-    axios.get("/vendor/profile", { headers })
+
+    axios
+      .get("/vendor/profile", { headers })
       .then((res) => {
         setProfile(res.data);
         sessionStorage.setItem("vendorInfo", JSON.stringify(res.data));
       })
       .catch(console.error);
-  }, [token]);
+  }, [token, headers]);
 
   // ── Notifications ──────────────────────────────────────────────────────
-  const fetchNotifications = () => {
+  const fetchNotifications = useCallback(() => {
     if (!token) return;
-    axios.get("/notifications/vendor", { headers })
+
+    axios
+      .get("/notifications/vendor", { headers })
       .then((r) => setNotifications(r.data))
       .catch(console.error);
-  };
+  }, [token, headers]);
 
-  useEffect(() => { fetchNotifications(); }, [token]);
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -61,26 +81,52 @@ export default function Dashboard() {
     try {
       await axios.put(`/notifications/${id}/read`, {}, { headers });
       setNotifications((prev) =>
-        prev.map((n) => n._id === id ? { ...n, isRead: true } : n)
+        prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
-    } catch { /* silent */ }
+    } catch {
+      // silent
+    }
   };
 
   const statCards = [
-    { label: "Total Products", value: stats.total,    color: "from-blue-500   to-blue-700",   icon: <FaBoxOpen size={24} /> },
-    { label: "Pending",        value: stats.pending,  color: "from-yellow-400 to-yellow-600", icon: <FaClock size={24} /> },
-    { label: "Approved",       value: stats.approved, color: "from-green-500  to-green-700",  icon: <FaCheckCircle size={24} /> },
-    { label: "Sold",           value: stats.sold,     color: "from-red-500    to-red-700",    icon: <FaTimesCircle size={24} /> },
+    {
+      label: "Total Products",
+      value: stats.total,
+      color: "from-blue-500 to-blue-700",
+      icon: <FaBoxOpen size={24} />,
+    },
+    {
+      label: "Pending",
+      value: stats.pending,
+      color: "from-yellow-400 to-yellow-600",
+      icon: <FaClock size={24} />,
+    },
+    {
+      label: "Approved",
+      value: stats.approved,
+      color: "from-green-500 to-green-700",
+      icon: <FaCheckCircle size={24} />,
+    },
+    {
+      label: "Sold",
+      value: stats.sold,
+      color: "from-red-500 to-red-700",
+      icon: <FaTimesCircle size={24} />,
+    },
   ];
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
-      {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-extrabold text-gray-800">Vendor Dashboard</h2>
+          <h2 className="text-3xl font-extrabold text-gray-800">
+            Vendor Dashboard
+          </h2>
           <p className="text-gray-400 text-sm mt-1">
-            Welcome, <span className="text-green-600 font-semibold">{profile?.tradeName || vendor?.tradeName || "Vendor"}</span>
+            Welcome,{" "}
+            <span className="text-green-600 font-semibold">
+              {profile?.tradeName || vendor?.tradeName || "Vendor"}
+            </span>
           </p>
         </div>
 
@@ -97,37 +143,53 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* ── Notifications Panel ──────────────────────────────────────────── */}
       {showNotif && (
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mb-8 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
             <h3 className="font-bold text-gray-800 flex items-center gap-2">
               <FaBell className="text-yellow-500" /> Notifications
               {unreadCount > 0 && (
-                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{unreadCount} new</span>
+                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {unreadCount} new
+                </span>
               )}
             </h3>
-            <button onClick={() => setShowNotif(false)} className="text-gray-400 hover:text-gray-700">
+            <button
+              onClick={() => setShowNotif(false)}
+              className="text-gray-400 hover:text-gray-700"
+            >
               <FaTimes />
             </button>
           </div>
 
           <div className="divide-y max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="text-center text-gray-400 py-8 text-sm">No notifications yet.</p>
+              <p className="text-center text-gray-400 py-8 text-sm">
+                No notifications yet.
+              </p>
             ) : (
               notifications.map((n) => (
                 <div
                   key={n._id}
-                  className={`px-6 py-4 flex items-start gap-3 ${n.isRead ? "bg-white" : "bg-green-50"}`}
+                  className={`px-6 py-4 flex items-start gap-3 ${
+                    n.isRead ? "bg-white" : "bg-green-50"
+                  }`}
                 >
-                  <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0
-                    ${n.isRead ? "bg-gray-300" : "bg-green-500"}`}
+                  <div
+                    className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
+                      n.isRead ? "bg-gray-300" : "bg-green-500"
+                    }`}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-sm">{n.subject}</p>
-                    <p className="text-gray-500 text-xs mt-0.5">{n.message}</p>
-                    <p className="text-gray-400 text-xs mt-1">{new Date(n.createdAt).toLocaleString()}</p>
+                    <p className="font-semibold text-gray-800 text-sm">
+                      {n.subject}
+                    </p>
+                    <p className="text-gray-500 text-xs mt-0.5">
+                      {n.message}
+                    </p>
+                    <p className="text-gray-400 text-xs mt-1">
+                      {new Date(n.createdAt).toLocaleString()}
+                    </p>
                   </div>
                   {!n.isRead && (
                     <button
@@ -145,10 +207,12 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
         {statCards.map(({ label, value, color, icon }) => (
-          <div key={label} className={`bg-gradient-to-br ${color} text-white rounded-2xl p-5 shadow flex items-center gap-4`}>
+          <div
+            key={label}
+            className={`bg-gradient-to-br ${color} text-white rounded-2xl p-5 shadow flex items-center gap-4`}
+          >
             <div className="bg-white bg-opacity-20 p-2 rounded-xl">{icon}</div>
             <div>
               <p className="text-3xl font-extrabold">{value}</p>
@@ -158,34 +222,51 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* ── Profile Card ────────────────────────────────────────────────── */}
       {profile && (
         <div className="bg-white rounded-2xl shadow p-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Business Profile</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">
+            Business Profile
+          </h3>
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm">
-              <ProfileRow label="Full Name"      value={`${profile.firstName} ${profile.lastName}`} />
-              <ProfileRow label="Trade Name"     value={profile.tradeName} />
-              <ProfileRow label="License No."    value={profile.licenseNumber} />
-              <ProfileRow label="TRN Number"     value={profile.trnNumber} />
-              <ProfileRow label="Business Type"  value={profile.businessType} />
-              <ProfileRow label="Vendor ID"      value={profile.idNumber} />
-              <ProfileRow label="Contact"        value={profile.contact} />
-              <ProfileRow label="Address"        value={`${profile.address}, ${profile.city}, ${profile.area}`} />
+              <ProfileRow
+                label="Full Name"
+                value={`${profile.firstName} ${profile.lastName}`}
+              />
+              <ProfileRow label="Trade Name" value={profile.tradeName} />
+              <ProfileRow label="License No." value={profile.licenseNumber} />
+              <ProfileRow label="TRN Number" value={profile.trnNumber} />
+              <ProfileRow label="Business Type" value={profile.businessType} />
+              <ProfileRow label="Vendor ID" value={profile.idNumber} />
+              <ProfileRow label="Contact" value={profile.contact} />
+              <ProfileRow
+                label="Address"
+                value={`${profile.address}, ${profile.city}, ${profile.area}`}
+              />
               <div className="sm:col-span-2">
                 <span className="text-gray-500 font-medium">Status: </span>
                 {profile.isApproved ? (
-                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">✅ Approved</span>
+                  <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                    ✅ Approved
+                  </span>
                 ) : (
-                  <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold">⏳ Pending Approval</span>
+                  <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-bold">
+                    ⏳ Pending Approval
+                  </span>
                 )}
               </div>
             </div>
 
             <div className="flex flex-row md:flex-col gap-3">
-              {profile.idCardImage   && <DocImage src={profile.idCardImage}   alt="ID Card" />}
-              {profile.licenseImage  && <DocImage src={profile.licenseImage}  alt="License" />}
-              {profile.passportImage && <DocImage src={profile.passportImage} alt="Passport" />}
+              {profile.idCardImage && (
+                <DocImage src={profile.idCardImage} alt="ID Card" />
+              )}
+              {profile.licenseImage && (
+                <DocImage src={profile.licenseImage} alt="License" />
+              )}
+              {profile.passportImage && (
+                <DocImage src={profile.passportImage} alt="Passport" />
+              )}
             </div>
           </div>
         </div>
@@ -197,7 +278,9 @@ export default function Dashboard() {
 function ProfileRow({ label, value }) {
   return (
     <div>
-      <span className="text-gray-400 text-xs uppercase tracking-wide">{label}</span>
+      <span className="text-gray-400 text-xs uppercase tracking-wide">
+        {label}
+      </span>
       <p className="text-gray-800 font-medium">{value || "—"}</p>
     </div>
   );
@@ -211,4 +294,3 @@ function DocImage({ src, alt }) {
     </div>
   );
 }
-
