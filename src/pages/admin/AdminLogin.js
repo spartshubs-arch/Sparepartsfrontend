@@ -29,7 +29,7 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white p-8 rounded shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Super Admin Login</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Admin Login</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
