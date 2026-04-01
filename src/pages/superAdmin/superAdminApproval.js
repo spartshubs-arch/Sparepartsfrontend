@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { FaCheckCircle, FaEdit, FaTimes, FaTrash } from "react-icons/fa"; // ← add FaTrash
 
-const ALL_PAGES = [
+const ALL_PAGES = [   
   { key: "dashboard",        label: "Dashboard" },
   { key: "vendors",          label: "Vendors" },
   { key: "view-products",    label: "Products" },
