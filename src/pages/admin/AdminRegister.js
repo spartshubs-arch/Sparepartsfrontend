@@ -68,7 +68,7 @@ export default function AdminRegister() {
         <input
           name="registeredBy"
           onChange={handleChange}
-          placeholder="Registered By (e.g. Super Admin)"
+          placeholder="Registered By (e.g. Super Admin name here)"
           required
           className="p-2 border rounded"
         />
