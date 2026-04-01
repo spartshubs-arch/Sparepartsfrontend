@@ -1,7 +1,6 @@
 // components/AdminProtectedRoute.jsx
 
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
 import axios from "../api/axios";
 
 // pageKey must match the keys in NAV_ITEMS e.g. "orders", "users"
