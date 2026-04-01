@@ -69,4 +69,3 @@ const handleSubmit = async (e) => {
     </div>
   );
 }
-   
