@@ -25,11 +25,5 @@ html, body { overflow-x: hidden; }
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
 }
-body {
-  font-family: 'Montserrat', sans-serif;
-}
 
-h1, h2, h3 {
-  font-family: 'Playfair Display', serif;
-}
 
