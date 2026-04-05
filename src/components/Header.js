@@ -1,7 +1,8 @@
+
+
 import { toast } from "react-toastify";
 import axios from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
-
 import {
   ShoppingCart,
   HelpCircle,
@@ -10,15 +11,15 @@ import {
   Menu,
   X,
 } from "lucide-react";
-
 import logo from "../logo/sparepartslogo.jpg";
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useCart } from "../components/CartContext";
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCallbackForm, setShowCallbackForm] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -28,12 +29,57 @@ export default function Header() {
   });
 
   const navigate = useNavigate();
+  const hideTimeout = useRef(null);
   const { cartItems } = useCart();
 
-  useEffect(() => {
-    const userInfo = sessionStorage.getItem("userInfo");
-    setIsLoggedIn(!!userInfo);
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const token = sessionStorage.getItem("userToken");
+      const userInfo = sessionStorage.getItem("userInfo");
+
+      if (!token || !userInfo) {
+        setIsLoggedIn(false);
+        setUnreadCount(0);
+        return;
+      }
+
+      setIsLoggedIn(true);
+
+      const res = await axios.get("/notifications/user/unread-count", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUnreadCount(res.data?.unreadCount || 0);
+    } catch (error) {
+      console.error("Unread count fetch failed:", error);
+      setUnreadCount(0);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, [fetchUnreadCount]);
+
+  useEffect(() => {
+    const handleNotificationUpdate = () => {
+      fetchUnreadCount();
+    };
+
+    const handleFocus = () => {
+      fetchUnreadCount();
+    };
+
+    const currentTimeout = hideTimeout.current;
+
+    window.addEventListener("user-notifications-updated", handleNotificationUpdate);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("user-notifications-updated", handleNotificationUpdate);
+      window.removeEventListener("focus", handleFocus);
+      clearTimeout(currentTimeout);
+    };
+  }, [fetchUnreadCount]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -50,43 +96,49 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-white shadow-md px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
+      <header className="bg-white shadow-md py-0.2 px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-          
-          {/* Left Section */}
-          <div className="flex items-center gap-4">
-            <Link to="/">
+          <div className="flex flex-row items-center gap-0 w-33 mr-20 lg:w-auto">
+            <Link to="/" className="flex items-center">
               <img
                 src={logo}
                 alt="Logo"
-                className="h-20 w-auto cursor-pointer"
+                className="h-24 md:h-16 lg:h-20 w-auto mr-20 cursor-pointer"
               />
             </Link>
 
             <button
               onClick={() => setShowCallbackForm(true)}
-              className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600"
+              className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full lg:w-auto text-center"
             >
               Request a Call Back
             </button>
           </div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex gap-6 text-black font-semibold">
-            <Link to="/" className="hover:text-orange-500">Home</Link>
-            <Link to="/shop" className="hover:text-orange-500">Shop</Link>
-            <Link to="/about" className="hover:text-orange-500">About Us</Link>
-            <Link to="/blog" className="hover:text-orange-500">Blog</Link>
-            <Link to="/faq" className="hover:text-orange-500">FAQ's</Link>
-            <Link to="/contact" className="hover:text-orange-500">Contact Us</Link>
+          <nav className="hidden lg:flex gap-6 text-black font-semibold ml-5">
+            <Link to="/" className="hover:text-orange-500">
+              Home
+            </Link>
+            <Link to="/shop" className="hover:text-orange-500">
+              Shop
+            </Link>
+            <Link to="/about" className="hover:text-orange-500">
+              About Us
+            </Link>
+            <Link to="/blog" className="hover:text-orange-500">
+              Blog
+            </Link>
+            <Link to="/faq" className="hover:text-orange-500">
+              FAQ's
+            </Link>
+            <Link to="/contact" className="hover:text-orange-500">
+              Contact Us
+            </Link>
           </nav>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-4">
-            
-            {/* Cart */}
-            <Link to="/cart" className="relative">
-              <ShoppingCart className="hover:text-orange-500" />
+          <div className="flex items-center gap-4 ml-auto relative bottom-2 md:bottom-0">
+            <Link to="/cart" title="Cart" className="relative">
+              <ShoppingCart className="text-gray-700 hover:text-orange-500" />
               {cartItems.length > 0 && (
                 <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
                   {cartItems.length}
@@ -94,116 +146,153 @@ export default function Header() {
               )}
             </Link>
 
-            {/* Orders */}
-            <Link to="/order">
-              <ClipboardList className="hover:text-orange-500" />
+            <Link to="/order" title="My Orders">
+              <ClipboardList className="text-gray-700 hover:text-orange-500" />
             </Link>
 
-            {/* Help */}
-            <Link to="/helpcenter">
-              <HelpCircle className="hover:text-orange-500" />
+            <Link to="/helpcenter" title="Help Center">
+              <HelpCircle className="text-gray-700 hover:text-orange-500" />
             </Link>
 
-            {/* Login/Profile */}
             {isLoggedIn ? (
               <Link
                 to="/profile"
-                className="text-white bg-orange-500 px-3 py-1 rounded flex items-center gap-1"
+                className="relative text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded flex items-center gap-1"
               >
                 <User size={16} />
                 Profile
+
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center font-bold">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </Link>
             ) : (
               <button
                 onClick={() => navigate("/loginuser")}
-                className="text-white bg-orange-500 px-3 py-1 rounded flex items-center gap-1"
+                className="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded flex items-center gap-1"
               >
                 <User size={16} />
                 Login
               </button>
             )}
 
-            {/* Mobile Menu Button */}
-            <div className="lg:hidden">
-              <button onClick={() => setMenuOpen(!menuOpen)}>
+            <div className="lg:hidden ml-20">
+              <button
+                className="text-gray-700 hover:text-orange-500"
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
                 {menuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {menuOpen && (
           <div className="lg:hidden mt-3 bg-white shadow-md rounded p-4">
-            <Link to="/" onClick={() => setMenuOpen(false)} className="block py-2">Home</Link>
-            <Link to="/shop" onClick={() => setMenuOpen(false)} className="block py-2">Shop</Link>
-            <Link to="/about" onClick={() => setMenuOpen(false)} className="block py-2">About</Link>
-            <Link to="/blog" onClick={() => setMenuOpen(false)} className="block py-2">Blog</Link>
-            <Link to="/faq" onClick={() => setMenuOpen(false)} className="block py-2">FAQ</Link>
-            <Link to="/contact" onClick={() => setMenuOpen(false)} className="block py-2">Contact</Link>
+            <Link
+              to="/"
+              className="block py-2 border-b hover:text-orange-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="block py-2 border-b hover:text-orange-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              Shop
+            </Link>
+            <Link
+              to="/about"
+              className="block py-2 border-b hover:text-orange-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              About Us
+            </Link>
+            <Link
+              to="/blog"
+              className="block py-2 border-b hover:text-orange-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              Blog
+            </Link>
+            <Link
+              to="/faq"
+              className="block py-2 border-b hover:text-orange-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              FAQ's
+            </Link>
+            <Link
+              to="/contact"
+              className="block py-2 hover:text-orange-500"
+              onClick={() => setMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
           </div>
         )}
       </header>
 
-      {/* Callback Modal */}
       {showCallbackForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded w-full max-w-md relative">
-            
+          <div className="bg-white rounded-lg p-6 w-full max-w-md relative">
             <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
               onClick={() => setShowCallbackForm(false)}
-              className="absolute top-2 right-2"
             >
               <X size={20} />
             </button>
 
             <h2 className="text-xl font-bold mb-4">Request a Call Back</h2>
 
-            <form onSubmit={handleFormSubmit} className="space-y-3">
+            <form onSubmit={handleFormSubmit} className="space-y-4">
               <input
                 type="text"
-                placeholder="Name"
-                className="w-full border p-2"
+                placeholder="Your Name"
+                className="w-full border p-2 rounded"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
                 required
               />
-
               <input
                 type="email"
-                placeholder="Email"
-                className="w-full border p-2"
+                placeholder="Your Email"
+                className="w-full border p-2 rounded"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
                 required
               />
-
               <input
                 type="tel"
-                placeholder="Phone"
-                className="w-full border p-2"
+                placeholder="Contact Number"
+                className="w-full border p-2 rounded"
                 value={formData.phone}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
                 required
               />
-
               <textarea
-                placeholder="Reason"
-                className="w-full border p-2"
+                placeholder="Reason for Callback"
+                className="w-full border p-2 rounded"
                 value={formData.reason}
                 onChange={(e) =>
                   setFormData({ ...formData, reason: e.target.value })
                 }
                 required
               />
-
-              <button className="bg-orange-500 text-white w-full py-2">
+              <button
+                type="submit"
+                className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full"
+              >
                 Submit
               </button>
             </form>
