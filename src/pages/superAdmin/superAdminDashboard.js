@@ -1,8 +1,7 @@
-
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
-import {  
+import {
   FaUserShield,
   FaCheckCircle,
   FaClock,
@@ -17,6 +16,7 @@ import {
   FaUsers,
   FaCheckSquare,
   FaSquare,
+  FaSearch,
 } from "react-icons/fa";
 
 const RECIPIENT_CONFIG = {
@@ -56,6 +56,7 @@ export default function SuperAdminDashboard() {
   const [sending, setSending] = useState(false);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
   const [recipientError, setRecipientError] = useState("");
+  const [sentSearch, setSentSearch] = useState("");
 
   const [form, setForm] = useState({
     subject: "",
@@ -124,6 +125,26 @@ export default function SuperAdminDashboard() {
       return name.includes(term) || subtitle.includes(term);
     });
   }, [recipients, search]);
+
+  const filteredSentNotifications = useMemo(() => {
+    const term = sentSearch.trim().toLowerCase();
+    if (!term) return notifications;
+
+    return notifications.filter((n) => {
+      const subject = n.subject?.toLowerCase() || "";
+      const message = n.message?.toLowerCase() || "";
+      const type = n.recipientType?.toLowerCase() || "";
+      const recipientName = n.recipientName?.toLowerCase() || "";
+      const recipientMeta = n.recipientMeta?.toLowerCase() || "";
+      return (
+        subject.includes(term) ||
+        message.includes(term) ||
+        type.includes(term) ||
+        recipientName.includes(term) ||
+        recipientMeta.includes(term)
+      );
+    });
+  }, [notifications, sentSearch]);
 
   const handleSubmit = async () => {
     if (!form.subject.trim() || !form.message.trim()) {
@@ -607,56 +628,84 @@ export default function SuperAdminDashboard() {
 
             {notifications.length > 0 && (
               <div className="mt-8">
-                <h3 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">
-                  Sent Notifications
-                </h3>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+                  <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    Sent Notifications
+                  </h3>
+
+                  <div className="relative w-full md:w-80">
+                    <FaSearch className="absolute left-3 top-3 text-gray-400 text-sm" />
+                    <input
+                      type="text"
+                      value={sentSearch}
+                      onChange={(e) => setSentSearch(e.target.value)}
+                      placeholder="Search subject, message, name, email, ID..."
+                      className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+                </div>
 
                 <div className="space-y-3">
-                  {notifications.map((n) => (
-                    <div
-                      key={n._id}
-                      className="flex items-start justify-between bg-gray-50 border border-gray-200 rounded-xl p-4"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <p className="font-semibold text-gray-800 text-sm">
-                            {n.subject}
+                  {filteredSentNotifications.length === 0 ? (
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-500">
+                      No sent notifications match your search.
+                    </div>
+                  ) : (
+                    filteredSentNotifications.map((n) => (
+                      <div
+                        key={n._id}
+                        className="flex items-start justify-between bg-gray-50 border border-gray-200 rounded-xl p-4"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <p className="font-semibold text-gray-800 text-sm">
+                              {n.subject}
+                            </p>
+                            {recipientBadge(n.recipientType)}
+                          </div>
+
+                          <p className="text-gray-500 text-xs line-clamp-2">
+                            {n.message}
                           </p>
-                          {recipientBadge(n.recipientType)}
+
+                          <p className="text-gray-400 text-xs mt-1">
+                            {new Date(n.createdAt).toLocaleString()}
+                          </p>
+
+                          <div className="mt-2 text-xs text-gray-600 space-y-1">
+                            <p>
+                              <span className="font-semibold">Recipient:</span>{" "}
+                              {n.recipientName || "Unknown"}
+                            </p>
+                            {n.recipientMeta && (
+                              <p>
+                                <span className="font-semibold">Details:</span>{" "}
+                                {n.recipientMeta}
+                              </p>
+                            )}
+                          </div>
                         </div>
 
-                        <p className="text-gray-500 text-xs line-clamp-2">
-                          {n.message}
-                        </p>
+                        <div className="flex gap-2 ml-4 flex-shrink-0">
+                          <button
+                            onClick={() => handleEdit(n)}
+                            className="text-blue-500 hover:text-blue-700 p-1"
+                            title="Edit"
+                          >
+                            <FaEdit size={14} />
+                          </button>
 
-                        <p className="text-gray-400 text-xs mt-1">
-                          {new Date(n.createdAt).toLocaleString()}
-                        </p>
-
-                        <p className="text-gray-400 text-xs mt-1">
-                          Recipient ID: {n.recipientId}
-                        </p>
+                          <button
+                            onClick={() => handleDelete(n._id)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                            title="Delete"
+                          >
+                            <FaTrash size={14} />
+                          </button>
+                        </div>
                       </div>
-
-                      <div className="flex gap-2 ml-4 flex-shrink-0">
-                        <button
-                          onClick={() => handleEdit(n)}
-                          className="text-blue-500 hover:text-blue-700 p-1"
-                          title="Edit"
-                        >
-                          <FaEdit size={14} />
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(n._id)}
-                          className="text-red-500 hover:text-red-700 p-1"
-                          title="Delete"
-                        >
-                          <FaTrash size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             )}
