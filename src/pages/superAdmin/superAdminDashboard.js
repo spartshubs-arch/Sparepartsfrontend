@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
@@ -12,7 +13,32 @@ import {
   FaEdit,
   FaTimes,
   FaPaperPlane,
+  FaStore,
+  FaUsers,
+  FaCheckSquare,
+  FaSquare,
 } from "react-icons/fa";
+
+const RECIPIENT_CONFIG = {
+  admin: {
+    label: "Admins",
+    endpoint: "/notifications/recipients/admins",
+    icon: <FaUserShield />,
+    chip: "bg-blue-100 text-blue-700",
+  },
+  vendor: {
+    label: "Vendors",
+    endpoint: "/notifications/recipients/vendors",
+    icon: <FaStore />,
+    chip: "bg-green-100 text-green-700",
+  },
+  user: {
+    label: "Users",
+    endpoint: "/notifications/recipients/users",
+    icon: <FaUsers />,
+    chip: "bg-purple-100 text-purple-700",
+  },
+};
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
@@ -27,12 +53,20 @@ export default function SuperAdminDashboard() {
   const [notifications, setNotifications] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [loadingRecipients, setLoadingRecipients] = useState(false);
+  const [recipientError, setRecipientError] = useState("");
+
   const [form, setForm] = useState({
     subject: "",
     message: "",
-    targetType: "admin",
+    recipientType: "admin",
   });
-  const [sending, setSending] = useState(false);
+
+  const [recipients, setRecipients] = useState([]);
+  const [selectedRecipientIds, setSelectedRecipientIds] = useState([]);
+  const [sendToAll, setSendToAll] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     axios
@@ -52,26 +86,92 @@ export default function SuperAdminDashboard() {
     fetchNotifications();
   }, [fetchNotifications]);
 
+  const fetchRecipients = useCallback(async () => {
+    try {
+      setLoadingRecipients(true);
+      setRecipientError("");
+
+      const endpoint = RECIPIENT_CONFIG[form.recipientType].endpoint;
+      const res = await axios.get(endpoint, { headers });
+
+      const data = Array.isArray(res.data) ? res.data : [];
+      setRecipients(data);
+    } catch (error) {
+      console.error("Recipient fetch error:", error);
+      setRecipients([]);
+      setRecipientError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to load recipients."
+      );
+    } finally {
+      setLoadingRecipients(false);
+    }
+  }, [form.recipientType, headers]);
+
+  useEffect(() => {
+    if (!showPanel || editingId) return;
+    fetchRecipients();
+  }, [fetchRecipients, showPanel, editingId]);
+
+  const filteredRecipients = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return recipients;
+
+    return recipients.filter((item) => {
+      const name = item.name?.toLowerCase() || "";
+      const subtitle = item.subtitle?.toLowerCase() || "";
+      return name.includes(term) || subtitle.includes(term);
+    });
+  }, [recipients, search]);
+
   const handleSubmit = async () => {
     if (!form.subject.trim() || !form.message.trim()) {
       alert("Please fill in subject and message.");
       return;
     }
 
+    if (!editingId && !sendToAll && selectedRecipientIds.length === 0) {
+      alert("Please select at least one recipient or enable Send To All.");
+      return;
+    }
+
     setSending(true);
     try {
       if (editingId) {
-        await axios.put(`/notifications/${editingId}`, form, { headers });
+        await axios.put(
+          `/notifications/${editingId}`,
+          {
+            subject: form.subject,
+            message: form.message,
+          },
+          { headers }
+        );
         alert("✅ Notification updated!");
       } else {
-        await axios.post("/notifications", form, { headers });
+        await axios.post(
+          "/notifications/superadmin/send",
+          {
+            recipientType: form.recipientType,
+            recipientIds: sendToAll ? [] : selectedRecipientIds,
+            sendToAll,
+            subject: form.subject,
+            message: form.message,
+          },
+          { headers }
+        );
         alert("✅ Notification sent!");
       }
 
-      setForm({ subject: "", message: "", targetType: "admin" });
-      setEditingId(null);
+      cancelEdit();
+      setShowPanel(true);
       fetchNotifications();
+
+      if (!editingId) {
+        fetchRecipients();
+      }
     } catch (err) {
+      console.error(err);
       alert(err.response?.data?.message || "Failed.");
     } finally {
       setSending(false);
@@ -81,32 +181,67 @@ export default function SuperAdminDashboard() {
   const handleEdit = (n) => {
     setEditingId(n._id);
     setForm({
-      subject: n.subject,
-      message: n.message,
-      targetType: n.targetType,
+      subject: n.subject || "",
+      message: n.message || "",
+      recipientType: n.recipientType || "admin",
     });
+    setSelectedRecipientIds([]);
+    setSendToAll(false);
+    setSearch("");
+    setRecipientError("");
     setShowPanel(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this notification?")) return;
+
     try {
       await axios.delete(`/notifications/${id}`, { headers });
       fetchNotifications();
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Failed to delete.");
     }
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setForm({ subject: "", message: "", targetType: "admin" });
+    setForm({
+      subject: "",
+      message: "",
+      recipientType: "admin",
+    });
+    setRecipients([]);
+    setSelectedRecipientIds([]);
+    setSendToAll(false);
+    setSearch("");
+    setRecipientError("");
   };
 
   const handleLogout = () => {
     localStorage.removeItem("superAdminToken");
     navigate("/superadmin/login");
+  };
+
+  const isSelected = (id) => selectedRecipientIds.includes(id);
+
+  const toggleRecipient = (id) => {
+    if (sendToAll || editingId) return;
+
+    setSelectedRecipientIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllVisible = () => {
+    if (editingId) return;
+    const ids = filteredRecipients.map((item) => item._id);
+    setSelectedRecipientIds((prev) => Array.from(new Set([...prev, ...ids])));
+  };
+
+  const clearSelected = () => {
+    setSelectedRecipientIds([]);
   };
 
   const cards = [
@@ -136,18 +271,15 @@ export default function SuperAdminDashboard() {
     },
   ];
 
-  const targetBadge = (t) => {
-    const map = {
-      admin: "bg-blue-100 text-blue-700",
-      vendor: "bg-green-100 text-green-700",
-      both: "bg-purple-100 text-purple-700",
-    };
+  const recipientBadge = (type) => {
+    const cfg = RECIPIENT_CONFIG[type];
+    if (!cfg) return null;
 
     return (
       <span
-        className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${map[t]}`}
+        className={`px-2 py-0.5 rounded-full text-xs font-semibold capitalize ${cfg.chip}`}
       >
-        {t === "both" ? "Admins & Vendors" : t}
+        {cfg.label}
       </span>
     );
   };
@@ -158,6 +290,7 @@ export default function SuperAdminDashboard() {
         <h1 className="text-2xl font-bold tracking-wide">
           ⚙️ Super Admin Panel
         </h1>
+
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
@@ -168,7 +301,7 @@ export default function SuperAdminDashboard() {
           >
             <FaBell /> Notifications
             {notifications.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs min-w-[20px] h-5 px-1 rounded-full flex items-center justify-center">
                 {notifications.length}
               </span>
             )}
@@ -223,7 +356,7 @@ export default function SuperAdminDashboard() {
               🔔 Notifications
             </h2>
             <p className="text-gray-500 text-sm">
-              Send announcements to admins, vendors, or both.{" "}
+              Send notifications to admins, vendors, or users.{" "}
               {notifications.length} sent so far.
             </p>
           </div>
@@ -246,86 +379,230 @@ export default function SuperAdminDashboard() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  value={form.subject}
-                  onChange={(e) =>
-                    setForm({ ...form, subject: e.target.value })
-                  }
-                  placeholder="Notification subject..."
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Message
-                </label>
-                <textarea
-                  rows={4}
-                  value={form.message}
-                  onChange={(e) =>
-                    setForm({ ...form, message: e.target.value })
-                  }
-                  placeholder="Write your message here..."
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Send To
-                </label>
-                <div className="flex gap-3">
-                  {["admin", "vendor", "both"].map((t) => (
-                    <label
-                      key={t}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <input
-                        type="radio"
-                        name="targetType"
-                        value={t}
-                        checked={form.targetType === t}
-                        onChange={() => setForm({ ...form, targetType: t })}
-                        className="accent-blue-600"
-                      />
-                      <span className="text-sm capitalize font-medium text-gray-700">
-                        {t === "both"
-                          ? "Both"
-                          : t === "admin"
-                          ? "Admins"
-                          : "Vendors"}
-                      </span>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2">
+                <div className="grid grid-cols-1 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subject
                     </label>
-                  ))}
+                    <input
+                      type="text"
+                      value={form.subject}
+                      onChange={(e) =>
+                        setForm({ ...form, subject: e.target.value })
+                      }
+                      placeholder="Notification subject..."
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Message
+                    </label>
+                    <textarea
+                      rows={5}
+                      value={form.message}
+                      onChange={(e) =>
+                        setForm({ ...form, message: e.target.value })
+                      }
+                      placeholder="Write your message here..."
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Send To
+                    </label>
+
+                    <div className="flex flex-wrap gap-3">
+                      {Object.entries(RECIPIENT_CONFIG).map(([key, cfg]) => (
+                        <label
+                          key={key}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition ${
+                            form.recipientType === key
+                              ? "border-blue-500 bg-blue-50 text-blue-700"
+                              : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="recipientType"
+                            value={key}
+                            checked={form.recipientType === key}
+                            disabled={!!editingId}
+                            onChange={() => {
+                              setForm({ ...form, recipientType: key });
+                              setSelectedRecipientIds([]);
+                              setSendToAll(false);
+                              setSearch("");
+                              setRecipientError("");
+                            }}
+                            className="accent-blue-600"
+                          />
+                          <span className="flex items-center gap-2 text-sm font-medium">
+                            {cfg.icon} {cfg.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {!editingId && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={sendToAll}
+                          onChange={(e) => setSendToAll(e.target.checked)}
+                          className="mt-1 accent-blue-600"
+                        />
+                        <div>
+                          <p className="font-semibold text-blue-800">
+                            Send to all{" "}
+                            {RECIPIENT_CONFIG[form.recipientType].label.toLowerCase()}
+                          </p>
+                          <p className="text-xs text-blue-600 mt-1">
+                            If checked, all recipients in this category will receive the notification.
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 flex-wrap">
+                    <button
+                      onClick={handleSubmit}
+                      disabled={sending}
+                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
+                    >
+                      <FaPaperPlane />
+                      {sending
+                        ? "Please wait..."
+                        : editingId
+                        ? "Update Notification"
+                        : "Send Notification"}
+                    </button>
+
+                    {editingId && (
+                      <button
+                        onClick={cancelEdit}
+                        className="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50"
+                      >
+                        Cancel Edit
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={handleSubmit}
-                disabled={sending}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-semibold disabled:opacity-50"
-              >
-                <FaPaperPlane />{" "}
-                {editingId ? "Update" : "Send Notification"}
-              </button>
+              <div className="border border-gray-200 rounded-2xl overflow-hidden bg-white">
+                <div className="px-4 py-3 bg-gray-50 border-b">
+                  <h3 className="font-bold text-gray-800">
+                    {editingId
+                      ? "Recipient info"
+                      : `${RECIPIENT_CONFIG[form.recipientType].label} List`}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {editingId
+                      ? "This edit only changes the selected notification record."
+                      : "Select one, many, or send to all."}
+                  </p>
+                </div>
 
-              {editingId && (
-                <button
-                  onClick={cancelEdit}
-                  className="px-4 py-2 border rounded-lg text-sm text-gray-600 hover:bg-gray-50"
-                >
-                  Cancel Edit
-                </button>
-              )}
+                {!editingId && (
+                  <div className="p-4 border-b space-y-3">
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder={`Search ${RECIPIENT_CONFIG[
+                        form.recipientType
+                      ].label.toLowerCase()}...`}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={selectAllVisible}
+                        type="button"
+                        className="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded"
+                      >
+                        Select All Visible
+                      </button>
+                      <button
+                        onClick={clearSelected}
+                        type="button"
+                        className="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
+                      >
+                        Clear Selected
+                      </button>
+                    </div>
+
+                    <div className="text-xs text-gray-500">
+                      Selected: {selectedRecipientIds.length}
+                    </div>
+
+                    {recipientError && (
+                      <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2">
+                        {recipientError}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="max-h-[420px] overflow-y-auto divide-y">
+                  {editingId ? (
+                    <div className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        {recipientBadge(form.recipientType)}
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        Subject and message can be edited here. Recipient targeting is not changed for already sent notification rows.
+                      </p>
+                    </div>
+                  ) : loadingRecipients ? (
+                    <p className="p-4 text-sm text-gray-500">Loading recipients...</p>
+                  ) : filteredRecipients.length === 0 ? (
+                    <p className="p-4 text-sm text-gray-500">No recipients found.</p>
+                  ) : (
+                    filteredRecipients.map((item) => {
+                      const checked = isSelected(item._id);
+
+                      return (
+                        <button
+                          key={item._id}
+                          type="button"
+                          disabled={sendToAll}
+                          onClick={() => toggleRecipient(item._id)}
+                          className={`w-full px-4 py-3 flex items-center justify-between text-left transition ${
+                            sendToAll
+                              ? "bg-gray-50 opacity-60 cursor-not-allowed"
+                              : checked
+                              ? "bg-blue-50"
+                              : "hover:bg-gray-50"
+                          }`}
+                        >
+                          <div>
+                            <p className="font-semibold text-sm text-gray-800">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {item.subtitle}
+                            </p>
+                          </div>
+
+                          <div className="text-blue-600">
+                            {checked ? <FaCheckSquare /> : <FaSquare />}
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
             </div>
 
             {notifications.length > 0 && (
@@ -333,6 +610,7 @@ export default function SuperAdminDashboard() {
                 <h3 className="text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">
                   Sent Notifications
                 </h3>
+
                 <div className="space-y-3">
                   {notifications.map((n) => (
                     <div
@@ -344,13 +622,19 @@ export default function SuperAdminDashboard() {
                           <p className="font-semibold text-gray-800 text-sm">
                             {n.subject}
                           </p>
-                          {targetBadge(n.targetType)}
+                          {recipientBadge(n.recipientType)}
                         </div>
+
                         <p className="text-gray-500 text-xs line-clamp-2">
                           {n.message}
                         </p>
+
                         <p className="text-gray-400 text-xs mt-1">
                           {new Date(n.createdAt).toLocaleString()}
+                        </p>
+
+                        <p className="text-gray-400 text-xs mt-1">
+                          Recipient ID: {n.recipientId}
                         </p>
                       </div>
 
@@ -362,6 +646,7 @@ export default function SuperAdminDashboard() {
                         >
                           <FaEdit size={14} />
                         </button>
+
                         <button
                           onClick={() => handleDelete(n._id)}
                           className="text-red-500 hover:text-red-700 p-1"
