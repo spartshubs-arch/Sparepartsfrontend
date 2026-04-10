@@ -474,16 +474,6 @@ export default function Login() {
         </span>
       </p>
 
-      {/* 🔐 Admin Login Link */}
-      <p className="mt-2 text-sm text-center">
-        Are you an admin?{" "}
-        <span
-          onClick={() => navigate("/admin/login")}
-          className="text-blue-600 hover:underline cursor-pointer"
-        >
-          Click here to login
-        </span>
-      </p>
     </div>
   );
 }
