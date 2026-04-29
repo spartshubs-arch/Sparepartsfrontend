@@ -107,9 +107,14 @@ export default function Register() {
       alert("✅ Registered successfully!");
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      alert("❌ Registration failed");
-    }
+  console.error("Registration error:", err);
+
+  const message =
+    err.response?.data?.message ||
+    "Registration failed. Please try again.";
+
+  alert(`❌ ${message}`);
+}
   };
 
   const handleCountryChange = (e) => {
