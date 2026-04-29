@@ -232,7 +232,6 @@ export default function Register() {
             onChange={handleContactChange}
             placeholder="Contact Number"
             required
-            maxLength={14}
             className="p-2 border rounded-r w-full"
           />
         </div>
@@ -252,7 +251,7 @@ export default function Register() {
           onChange={(e) => handlePlaceChange("city", e.target.value)}
           placeholder="City"
           required
-          maxLength={50}
+          maxLength={100}
           className="p-2 border rounded"
         />
 
