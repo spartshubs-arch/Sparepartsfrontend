@@ -98,11 +98,11 @@ export default function Header() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
      <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
   <Link to="/" className="flex items-center self-start lg:self-center">
-    <img
-      src={logo}
-      alt="Logo"
-      className="h-24 lg:h-24 w-auto cursor-pointer"
-    />
+<img
+  src={logo}
+  alt="Logo"
+  className="h-20 md:h-16 lg:h-24 w-auto lg:mr-6 cursor-pointer"
+/>
   </Link>
 
   <button
