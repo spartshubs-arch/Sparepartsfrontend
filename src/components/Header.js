@@ -96,7 +96,7 @@ export default function Header() {
     <>
       <header className="bg-white shadow-md py-0.2 px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
   <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-  <div className="flex flex-row items-center gap-3 lg:gap-4">
+ <div className="flex flex-row items-center gap-2 lg:gap-4">
     <Link to="/" className="flex items-center">
       <img
         src={logo}
