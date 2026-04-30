@@ -98,21 +98,21 @@ export default function Header() {
     <>
       <header className="bg-white shadow-md py-0.2 px-4 border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div className="flex flex-row items-center gap-0 w-33 mr-20 lg:w-auto">
+          <div className="flex flex-row items-center gap-2 w-full lg:w-auto">
             <Link to="/" className="flex items-center">
-              <img
-                src={logo}
-                alt="Logo"
-                className="h-24 md:h-16 lg:h-20 w-auto mr-20 cursor-pointer"
-              />
+             <img
+  src={logo}
+  alt="Logo"
+  className="h-20 md:h-16 lg:h-24 w-auto lg:mr-6 cursor-pointer"
+/>
             </Link>
 
-            <button
-              onClick={() => setShowCallbackForm(true)}
-              className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full lg:w-auto text-center"
-            >
-              Request a Call Back
-            </button>
+           <button
+  onClick={() => setShowCallbackForm(true)}
+  className="bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-sm lg:text-base lg:px-4"
+>
+  Request a Call Back
+</button>
           </div>
 
           <nav className="hidden lg:flex gap-6 text-black font-semibold ml-5">
