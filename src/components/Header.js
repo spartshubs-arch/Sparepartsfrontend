@@ -105,12 +105,12 @@ export default function Header() {
 />
   </Link>
 
-  <button
-    onClick={() => setShowCallbackForm(true)}
-    className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-sm lg:text-base"
-  >
-    Request a Call Back
-  </button>
+ <button
+  onClick={() => setShowCallbackForm(true)}
+  className="bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-sm lg:text-base lg:px-4"
+>
+  Request a Call Back
+</button>
 </div>
           <nav className="hidden lg:flex gap-6 text-black font-semibold ml-5">
             <Link to="/" className="hover:text-orange-500">
