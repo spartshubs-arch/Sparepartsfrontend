@@ -237,7 +237,7 @@ export default function Register() {
             onChange={handleContactChange}
             placeholder="Contact Number"
             required
-            maxLength={14}
+            maxLength={13}
             className="p-2 border rounded-r w-full"
           />
         </div>
