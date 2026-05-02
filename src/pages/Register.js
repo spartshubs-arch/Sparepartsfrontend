@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import axios from "../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -196,27 +195,46 @@ export default function Register() {
           className="p-2 border rounded"
         />
 
-        <div className="col-span-2 relative">
-          <input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            placeholder="Password (8+ chars, 1 uppercase, 1 special char)"
-            required
-            minLength={8}
-            title="Password must be at least 8 characters long and include 1 uppercase letter and 1 special character"
-            className="p-2 w-full border rounded"
-          />
+        // <div className="col-span-2 relative">
+        //   <input
+        //     type={showPassword ? "text" : "password"}
+        //     name="password"
+        //     value={form.password}
+        //     onChange={(e) => setForm({ ...form, password: e.target.value })}
+        //     placeholder="Password (8+ chars, 1 uppercase, 1 special char)"
+        //     required
+        //     minLength={8}
+        //     title="Password must be at least 8 characters long and include 1 uppercase letter and 1 special character"
+        //     className="p-2 w-full border rounded"
+        //   />
 
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-2 cursor-pointer text-sm text-gray-600"
-          >
-            {showPassword ? "🙈 Hide" : "👁 Show"}
-          </span>
-        </div>
+        //   <span
+        //     onClick={() => setShowPassword(!showPassword)}
+        //     className="absolute right-3 top-2 cursor-pointer text-sm text-gray-600"
+        //   >
+        //     {showPassword ? "🙈 Hide" : "👁 Show"}
+        //   </span>
+        // </div>
+<div className="col-span-2 relative">
+  <input
+    type={showPassword ? "text" : "password"}
+    name="password"
+    value={form.password}
+    onChange={(e) => setForm({ ...form, password: e.target.value })}
+    placeholder="Password (8+ chars, 1 uppercase, 1 special)"
+    required
+    minLength={8}
+    title="Password must be at least 8 characters long and include 1 uppercase letter and 1 special character"
+    className="p-2 pr-16 w-full border rounded"
+  />
 
+  <span
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-xs text-gray-600 bg-white px-1"
+  >
+    {showPassword ? "🙈 Hide" : "👁 Show"}
+  </span>
+</div>
         <div className="col-span-2 flex">
           <select
             value={countryCode}
