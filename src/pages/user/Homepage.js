@@ -33,8 +33,8 @@ const [productNo, setProductNo] = useState('');
 
 
 // Put this above the return:
-const yearOptions = Array.from({ length: 25 }, (_, i) => {
-  const year = 2000 + i;
+const yearOptions = Array.from({ length: 30 }, (_, i) => {
+  const year = 1975 + i;
   return { value: year, label: year };
 });
 
