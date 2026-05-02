@@ -191,21 +191,21 @@ export default function Header() {
           </div>
 
           {/* Mobile Header */}
-          <div className="lg:hidden flex flex-col w-full py-2">
+<div className="lg:hidden flex flex-col w-full py-1">
             {/* Top mobile row */}
             <div className="flex items-center justify-between w-full">
-            <div className="flex items-center">
+           <div className="flex items-center">
   <Link to="/" className="flex items-center shrink-0">
     <img
       src={logo}
       alt="Logo"
-      className="h-28 sm:h-32 w-auto cursor-pointer object-contain"
+      className="h-20 sm:h-24 w-auto cursor-pointer object-contain"
     />
   </Link>
 
   <button
     onClick={() => setShowCallbackForm(true)}
-    className="ml-10 sm:ml-12 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
+    className="ml-8 sm:ml-10 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
   >
     Request a Call Back
   </button>
@@ -221,7 +221,8 @@ export default function Header() {
             </div>
 
             {/* Bottom mobile icons row */}
-            <div className="flex items-center justify-center gap-6 mt-2">
+           
+<div className="flex items-center justify-center gap-6 mt-1">
               <Link to="/cart" title="Cart" className="relative">
                 <ShoppingCart
                   size={21}
