@@ -194,18 +194,18 @@ export default function Header() {
           <div className="lg:hidden flex flex-col w-full py-2">
             {/* Top mobile row */}
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center">
+            <div className="flex items-center">
   <Link to="/" className="flex items-center shrink-0">
     <img
       src={logo}
       alt="Logo"
-      className="h-20 sm:h-24 w-auto cursor-pointer object-contain"
+      className="h-24 sm:h-28 w-auto cursor-pointer object-contain"
     />
   </Link>
 
   <button
     onClick={() => setShowCallbackForm(true)}
-    className="ml-4 sm:ml-6 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
+    className="ml-6 sm:ml-8 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
   >
     Request a Call Back
   </button>
