@@ -199,13 +199,13 @@ export default function Header() {
     <img
       src={logo}
       alt="Logo"
-      className="h-20 sm:h-24 w-auto cursor-pointer object-contain"
+      className="h-24 sm:h-28 w-auto cursor-pointer object-contain"
     />
   </Link>
 
   <button
     onClick={() => setShowCallbackForm(true)}
-    className="ml-8 sm:ml-10 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
+    className="ml-6 sm:ml-8 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
   >
     Request a Call Back
   </button>
