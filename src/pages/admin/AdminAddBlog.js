@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import axios from "../../api/axios";
 import { FaTrash, FaPlus } from "react-icons/fa";
+import RichTextEditor from "./RichTextEditor";
 
 export default function AdminBlogManager() {
   const [title, setTitle] = useState("");
@@ -103,6 +103,13 @@ export default function AdminBlogManager() {
     }
   };
 
+  // Content is now HTML (from RichTextEditor) rather than plain text —
+  // this strips tags just for the short admin-list preview text.
+  const excerptOf = (html, max = 100) => {
+    const text = (html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    return text.length > max ? text.slice(0, max) + "..." : text;
+  };
+
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
       <h2 className="text-2xl font-bold mb-6">📝 Manage Blogs</h2>
@@ -112,7 +119,7 @@ export default function AdminBlogManager() {
         className="bg-white shadow-md rounded-lg p-6 mb-8 space-y-4"
       >
         <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 p-3 rounded-md text-sm">
-          📏 <strong>Image Guidelines:</strong> Please upload images with a size of
+          📏 <strong>Cover Image Guidelines:</strong> Please upload images with a size of
           <strong> 153×192</strong> for best quality. Max file size: <strong>2MB</strong>.
         </div>
 
@@ -125,28 +132,43 @@ export default function AdminBlogManager() {
           className="w-full p-3 border rounded focus:ring focus:ring-orange-300"
         />
 
-        <textarea
-          placeholder="Blog Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          required
-          rows="5"
-          className="w-full p-3 border rounded focus:ring focus:ring-orange-300"
-        />
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            Blog Content
+          </label>
+          {/*
+            Replaces the old plain <textarea>. This editor preserves bold,
+            headings, lists and links when you paste an article from
+            elsewhere, and lets you drop in an image directly via the
+            toolbar's 🖼 Image button (uploaded straight to Cloudinary,
+            same as the cover image below).
+          */}
+          <RichTextEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Write or paste blog content here..."
+            folder="blogs"
+          />
+        </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-          required
-          className="block w-full text-sm text-gray-500
-                     file:mr-4 file:py-2 file:px-4
-                     file:rounded-full file:border-0
-                     file:text-sm file:font-semibold
-                     file:bg-orange-50 file:text-orange-700
-                     hover:file:bg-orange-100"
-        />
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-700">
+            Cover Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            required
+            className="block w-full text-sm text-gray-500
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-full file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-orange-50 file:text-orange-700
+                       hover:file:bg-orange-100"
+          />
+        </div>
 
         <button
           type="submit"
@@ -178,7 +200,7 @@ export default function AdminBlogManager() {
               <div className="p-4 flex flex-col flex-grow">
                 <h4 className="font-bold text-lg mb-2">{blog.title}</h4>
                 <p className="text-gray-600 text-sm flex-grow">
-                  {blog.content.length > 100 ? blog.content.slice(0, 100) + "..." : blog.content}
+                  {excerptOf(blog.content)}
                 </p>
                 <button
                   onClick={() => handleDelete(blog._id)}
