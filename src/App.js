@@ -30,6 +30,7 @@ import EditProduct from './pages/EditProduct';
 import Home from './pages/user/Homepage';
 import Contact from './pages/user/Contact';
 import Blog from './pages/user/Blog';
+import BlogDetailPage from './pages/user/BlogDetailPage';
 import About from './pages/user/About';
 import ShopPage from './pages/user/ShopPage';
 import ProductDetailPage from './pages/user/ProductDetailPage';
@@ -91,6 +92,7 @@ function App() {
             <Route path="shop"    element={<ShopPage />} />
             <Route path="order"   element={<OrdersPage />} />
             <Route path="blog"    element={<Blog />} />
+            <Route path="blog/:id" element={<BlogDetailPage />} />
             <Route path="helpcenter" element={<HelpCenter />} />
             <Route path="faq"     element={<Faq />} />
             <Route path="profile" element={<Profile />} />
