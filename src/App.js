@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify"; 
 import Register from './pages/Register';
 import VendorLogin from './pages/VendorLogin';
 import UserLayout from './pages/user/UserLayout';
