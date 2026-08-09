@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "../../api/axios";
 
-// Content is now rich HTML (from the admin's RichTextEditor) rather than
+
 // plain text — this strips tags just for the short card preview text.
 function excerptOf(html, max = 100) {
   const text = (html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
