@@ -5,7 +5,7 @@ import RichTextEditor from "./RichTextEditor";
 
 export default function AdminBlogManager() {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(""); 
   const [imageFile, setImageFile] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [uploading, setUploading] = useState(false);
