@@ -9,7 +9,7 @@ export default function AdminBlogManager() {
   const [imageFile, setImageFile] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(0); 
 
   const fileInputRef = useRef(null);
 
