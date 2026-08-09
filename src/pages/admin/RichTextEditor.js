@@ -185,6 +185,11 @@ export default function RichTextEditor({ value, onChange, placeholder, folder = 
     if (editorRef.current && !editorRef.current.innerHTML && value) {
       editorRef.current.innerHTML = sanitize(value);
     }
+    // Intentionally run once on mount only — this sets the editor's
+    // starting content. Adding `value` as a dependency would re-run this
+    // on every keystroke (since typing updates `value` via onChange),
+    // wiping the cursor position and re-injecting content while editing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveSelection = () => {
