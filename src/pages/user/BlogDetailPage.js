@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "../../api/axios";
 
-// Minimal safety pass before rendering admin-authored HTML — strips
-// anything that could execute code, even though this content only ever
-// comes from your own admin panel.
 function sanitize(html) {
   return (html || "")
     .replace(/<script[\s\S]*?<\/script>/gi, "")
