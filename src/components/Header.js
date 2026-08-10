@@ -1,3 +1,4 @@
+
 import { toast } from "react-toastify";
 import axios from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -103,7 +104,14 @@ export default function Header() {
     <>
       <header className="bg-white shadow-md border-b-4 border-orange-500 fixed top-0 left-0 w-full z-50">
         <div className="w-full px-3 sm:px-4 lg:px-8">
-          {/* Desktop Header */}
+
+          {/* ══════════════════════════════════════════════════════════════
+              DESKTOP ONLY — everything inside this block is invisible
+              below the `lg` breakpoint (hidden lg:grid). Edits here can
+              NEVER affect the mobile block below, since Tailwind can't
+              apply `lg:`-gated classes under `lg`, and this whole block
+              carries `hidden` outside of `lg` regardless.
+              ══════════════════════════════════════════════════════════ */}
           <div className="hidden lg:grid grid-cols-[auto_1fr_auto] items-center min-h-[96px] gap-6">
             {/* Left */}
             <div className="flex items-center gap-6">
@@ -189,40 +197,56 @@ export default function Header() {
               )}
             </div>
           </div>
+          {/* ══════════════════════ END DESKTOP ONLY ══════════════════════ */}
 
-          {/* Mobile Header */}
-<div className="lg:hidden flex flex-col w-full py-1">
+
+          {/* ══════════════════════════════════════════════════════════════
+              MOBILE ONLY — everything inside this block is invisible at
+              `lg` and above (lg:hidden). This is a completely separate
+              element tree from the desktop block above it — same rule
+              applies in reverse: nothing you change here can reach the
+              desktop markup.
+              ══════════════════════════════════════════════════════════ */}
+          <div className="lg:hidden flex flex-col w-full py-1">
             {/* Top mobile row */}
             <div className="flex items-center justify-between w-full">
-           <div className="flex items-center">
-  <Link to="/" className="flex items-center shrink-0">
-    <img
-      src={logo}
-      alt="Logo"
-      className="h-24 sm:h-28 w-auto cursor-pointer object-contain"
-    />
-  </Link>
+              {/* self-center on both children (not just items-center on
+                  the parent) plus leading-none on the button removes the
+                  small optical offset that default line-height adds above/
+                  below button text — that invisible extra space is what
+                  was making it look almost-but-not-quite centered against
+                  the logo. */}
+              <div className="flex items-center gap-4 sm:gap-6">
+                <Link to="/" className="flex items-center self-center shrink-0">
+                  <img
+                    src={logo}
+                    alt="Logo"
+                    className="h-16 sm:h-20 w-auto cursor-pointer object-contain block"
+                  />
+                </Link>
 
-  <button
-    onClick={() => setShowCallbackForm(true)}
-    className="ml-6 sm:ml-8 bg-orange-500 text-white px-3 py-2 rounded hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
-  >
-    Request a Call Back
-  </button>
-</div>
+                <button
+                  onClick={() => setShowCallbackForm(true)}
+                  className="self-center leading-none bg-orange-500 text-white px-6 py-2 rounded ml-7 hover:bg-orange-600 whitespace-nowrap text-[11px] sm:text-sm font-medium"
+                >
+                  Request a Call Back
+                </button>
+              </div>
 
+              {/* Hamburger — bumped up from size 24 to 30, with a bigger
+                  tap target (p-2 → effectively ~44px, the standard
+                  minimum comfortable touch size) instead of the old p-1. */}
               <button
-                className="text-gray-700 hover:text-orange-500 p-1"
+                className="self-center text-gray-700 hover:text-orange-500 p-2 shrink-0"
                 onClick={() => setMenuOpen(!menuOpen)}
                 aria-label="Toggle menu"
               >
-                {menuOpen ? <X size={24} /> : <Menu size={24} />}
+                {menuOpen ? <X size={30} /> : <Menu size={30} />}
               </button>
             </div>
 
             {/* Bottom mobile icons row */}
-           
-<div className="flex items-center justify-center gap-6 mt-1">
+            <div className="flex items-center justify-center gap-6 mt-1">
               <Link to="/cart" title="Cart" className="relative">
                 <ShoppingCart
                   size={21}
@@ -322,6 +346,8 @@ export default function Header() {
               </nav>
             )}
           </div>
+          {/* ══════════════════════ END MOBILE ONLY ══════════════════════ */}
+
         </div>
       </header>
 
