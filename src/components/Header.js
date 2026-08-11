@@ -1,4 +1,3 @@
-
 import { toast } from "react-toastify";
 import axios from "../api/axios";
 import { Link, useNavigate } from "react-router-dom";
@@ -112,7 +111,12 @@ export default function Header() {
               apply `lg:`-gated classes under `lg`, and this whole block
               carries `hidden` outside of `lg` regardless.
               ══════════════════════════════════════════════════════════ */}
-          <div className="hidden lg:grid grid-cols-[auto_1fr_auto] items-center min-h-[96px] gap-6">
+          <div className="hidden lg:grid grid-cols-[auto_1fr_auto] items-center min-h-[96px] py-2 gap-6">
+            {/* py-2 added above: the logo (h-24 = 96px) exactly matched
+                the old min-h-[96px], leaving zero breathing room top/
+                bottom. This small padding gives it a little air on both
+                edges without changing the overall header feel. */}
+
             {/* Left */}
             <div className="flex items-center gap-6">
               <Link to="/" className="flex items-center shrink-0">
@@ -207,7 +211,11 @@ export default function Header() {
               applies in reverse: nothing you change here can reach the
               desktop markup.
               ══════════════════════════════════════════════════════════ */}
-          <div className="lg:hidden flex flex-col w-full py-1">
+          <div className="lg:hidden flex flex-col w-full pt-3 pb-1">
+            {/* pt-3 (was py-1) nudges the whole top row — logo included —
+                down a little from the very top edge, matching the "move
+                logo down a bit" request. Bottom stays tight via pb-1. */}
+
             {/* Top mobile row */}
             <div className="flex items-center justify-between w-full">
               {/* self-center on both children (not just items-center on
