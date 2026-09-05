@@ -529,8 +529,8 @@ export default function App() {
 
         <div style={styles.warningContainer}>
 
-          <div style={styles.triangle}>
-  <span style={styles.triangleExclamation}>!</span>
+   <div style={styles.warningTriangle}>
+  <div style={styles.warningExclamation}>!</div>
 </div>
 
           <h1 style={styles.title}>
@@ -822,25 +822,32 @@ const styles = {
     paddingTop: "98px",
   },
 
-triangle: {
-  width: 0,
-  height: 0,
-  borderLeft: "28px solid transparent",
-  borderRight: "28px solid transparent",
-  borderBottom: "49px solid white",
+warningTriangle: {
   position: "relative",
+  width: "56px",
+  height: "49px",
   marginBottom: "32px",
 },
 
-triangleExclamation: {
+warningTriangle: {
+  position: "relative",
+  width: "0",
+  height: "0",
+  borderLeft: "28px solid transparent",
+  borderRight: "28px solid transparent",
+  borderBottom: "49px solid white",
+  marginBottom: "32px",
+},
+
+warningExclamation: {
   position: "absolute",
   left: "-5px",
-  top: "17px",
+  top: "16px",
   color: "#df2d23",
-  fontSize: "24px",
+  fontSize: "25px",
   fontWeight: "bold",
   lineHeight: "1",
-  zIndex: 5,
+  zIndex: 10,
 },
 
   title: {
