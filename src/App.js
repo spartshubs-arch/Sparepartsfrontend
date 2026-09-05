@@ -530,8 +530,8 @@ export default function App() {
         <div style={styles.warningContainer}>
 
           <div style={styles.triangle}>
-            <span>!</span>
-          </div>
+  <span style={styles.triangleExclamation}>!</span>
+</div>
 
           <h1 style={styles.title}>
             The site ahead contains harmful programs
@@ -822,15 +822,26 @@ const styles = {
     paddingTop: "98px",
   },
 
-  triangle: {
-    width: 0,
-    height: 0,
-    borderLeft: "28px solid transparent",
-    borderRight: "28px solid transparent",
-    borderBottom: "49px solid white",
-    position: "relative",
-    marginBottom: "32px",
-  },
+triangle: {
+  width: 0,
+  height: 0,
+  borderLeft: "28px solid transparent",
+  borderRight: "28px solid transparent",
+  borderBottom: "49px solid white",
+  position: "relative",
+  marginBottom: "32px",
+},
+
+triangleExclamation: {
+  position: "absolute",
+  left: "-5px",
+  top: "17px",
+  color: "#df2d23",
+  fontSize: "24px",
+  fontWeight: "bold",
+  lineHeight: "1",
+  zIndex: 5,
+},
 
   title: {
     fontSize: "21px",
