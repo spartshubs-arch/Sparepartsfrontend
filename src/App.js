@@ -294,38 +294,414 @@
 
 
 
+import React, { useState } from "react";
 
+export default function App() {
+  const [details, setDetails] = useState(false);
+  const [consent, setConsent] = useState(false);
+  const [unsafe, setUnsafe] = useState(false);
+  const [incident, setIncident] = useState(false);
 
-import React from "react";
+  // -------------------------------
+  // SAFE LANDING PAGE
+  // -------------------------------
+  if (!incident) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#f8f9fa",
+          fontFamily: "Arial, Helvetica, sans-serif",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            background: "white",
+            width: 520,
+            padding: 40,
+            borderRadius: 10,
+            boxShadow: "0 2px 15px rgba(0,0,0,.12)",
+            textAlign: "center",
+          }}
+        >
+          <h2>Security Demonstration Environment</h2>
 
-function App() {
-  return (
-    <div className="warning-page">
-      <div className="warning-container">
+          <p style={{ color: "#666", lineHeight: 1.6 }}>
+            This is a controlled localhost cybersecurity training
+            environment.
+          </p>
 
-        {/* Warning Triangle */}
-        <div className="warning-icon">
-          <div className="triangle">
-            <span>!</span>
+          <button
+            onClick={() => setIncident(true)}
+            style={{
+              marginTop: 20,
+              padding: "12px 22px",
+              border: 0,
+              borderRadius: 5,
+              background: "#d93025",
+              color: "white",
+              cursor: "pointer",
+              fontSize: 14,
+            }}
+          >
+            Simulate Security Warning
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------
+  // UNSAFE SIMULATION
+  // -------------------------------
+  if (unsafe) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#fff",
+          fontFamily: "Arial, Helvetica, sans-serif",
+          padding: 50,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 850,
+            margin: "0 auto",
+            border: "1px solid #dadce0",
+            borderRadius: 8,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              background: "#202124",
+              color: "white",
+              padding: 18,
+              fontSize: 15,
+            }}
+          >
+            Security Training Environment
+          </div>
+
+          <div style={{ padding: 35 }}>
+            <h2 style={{ color: "#b3261e" }}>
+              ⚠ Simulated Security Incident
+            </h2>
+
+            <p>
+              The user selected the simulated unsafe continuation option.
+            </p>
+
+            <div
+              style={{
+                background: "#fce8e6",
+                border: "1px solid #f5c2c0",
+                padding: 20,
+                borderRadius: 6,
+                marginTop: 20,
+              }}
+            >
+              <strong>Incident ID:</strong> DEMO-SEC-001
+              <br />
+              <strong>Environment:</strong> localhost
+              <br />
+              <strong>Detection:</strong> Suspicious page behavior
+              <br />
+              <strong>Status:</strong> Contained
+            </div>
+
+            <h3 style={{ marginTop: 30 }}>Simulated Indicators</h3>
+
+            <ul style={{ lineHeight: 2 }}>
+              <li>Unexpected external script request</li>
+              <li>Suspicious redirect behavior</li>
+              <li>Unauthorized DOM modification attempt</li>
+              <li>Unknown third-party resource</li>
+            </ul>
+
+            <h3>Recommended Response</h3>
+
+            <ol style={{ lineHeight: 2 }}>
+              <li>Isolate the affected application.</li>
+              <li>Review application and server logs.</li>
+              <li>Identify unauthorized changes.</li>
+              <li>Remove malicious/injected resources.</li>
+              <li>Rotate compromised credentials if applicable.</li>
+              <li>Patch the vulnerable component.</li>
+              <li>Re-scan the application.</li>
+            </ol>
+
+            <button
+              onClick={() => setIncident(false)}
+              style={{
+                marginTop: 20,
+                padding: "11px 20px",
+                background: "#1a73e8",
+                color: "white",
+                border: 0,
+                borderRadius: 5,
+                cursor: "pointer",
+              }}
+            >
+              Return to Safe Environment
+            </button>
           </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* Main heading */}
-        <h1>The site ahead contains harmful programs</h1>
+  // -------------------------------
+  // DETAILS PANEL
+  // -------------------------------
+  if (details) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#f8f9fa",
+          fontFamily: "Arial, Helvetica, sans-serif",
+          padding: "50px 20px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 760,
+            margin: "0 auto",
+            background: "white",
+            borderRadius: 8,
+            boxShadow: "0 2px 12px rgba(0,0,0,.15)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              background: "#202124",
+              color: "white",
+              padding: 20,
+              fontSize: 17,
+            }}
+          >
+            Security Diagnostic Information
+          </div>
 
-        {/* Description */}
-        <p className="description">
+          <div style={{ padding: 30 }}>
+            <h2>Simulated Threat Analysis</h2>
+
+            <p style={{ color: "#5f6368" }}>
+              The following information is generated exclusively for this
+              cybersecurity demonstration.
+            </p>
+
+            <hr />
+
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                marginTop: 20,
+              }}
+            >
+              <tbody>
+                <tr>
+                  <td style={cellLabel}>Environment</td>
+                  <td style={cellValue}>localhost</td>
+                </tr>
+
+                <tr>
+                  <td style={cellLabel}>Detection Type</td>
+                  <td style={cellValue}>Suspicious Web Behavior</td>
+                </tr>
+
+                <tr>
+                  <td style={cellLabel}>Risk Level</td>
+                  <td style={cellValue}>
+                    <span
+                      style={{
+                        background: "#fce8e6",
+                        color: "#c5221f",
+                        padding: "4px 9px",
+                        borderRadius: 4,
+                      }}
+                    >
+                      HIGH — SIMULATED
+                    </span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style={cellLabel}>Incident ID</td>
+                  <td style={cellValue}>DEMO-SEC-001</td>
+                </tr>
+
+                <tr>
+                  <td style={cellLabel}>Status</td>
+                  <td style={cellValue}>Blocked by simulation</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 style={{ marginTop: 35 }}>Security Events</h3>
+
+            <div style={logBox}>
+              <div>[16:28:41] Request received</div>
+              <div>[16:28:42] Page behavior analyzed</div>
+              <div>[16:28:42] Suspicious resource detected</div>
+              <div>[16:28:43] Navigation blocked</div>
+              <div>[16:28:43] Security warning displayed</div>
+            </div>
+
+            <h3 style={{ marginTop: 30 }}>Recommended Investigation</h3>
+
+            <ul style={{ lineHeight: 1.9 }}>
+              <li>Inspect network requests.</li>
+              <li>Review application logs.</li>
+              <li>Check recently modified files.</li>
+              <li>Audit third-party dependencies.</li>
+              <li>Review authentication and access logs.</li>
+              <li>Check Content Security Policy violations.</li>
+              <li>Verify unexpected redirects.</li>
+            </ul>
+
+            <button
+              onClick={() => setDetails(false)}
+              style={{
+                marginTop: 20,
+                padding: "10px 20px",
+                background: "#1a73e8",
+                color: "white",
+                border: 0,
+                borderRadius: 5,
+                cursor: "pointer",
+              }}
+            >
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // -------------------------------
+  // MAIN WARNING SCREEN
+  // -------------------------------
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#df2d23",
+        color: "white",
+        fontFamily: "Arial, Helvetica, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          width: 520,
+          margin: "0 auto",
+          paddingTop: 98,
+        }}
+      >
+        {/* WARNING ICON */}
+
+        <div
+          style={{
+            width: 0,
+            height: 0,
+            borderLeft: "28px solid transparent",
+            borderRight: "28px solid transparent",
+            borderBottom: "49px solid white",
+            position: "relative",
+            marginBottom: 32,
+          }}
+        >
+          <span
+            style={{
+              position: "absolute",
+              left: -4,
+              top: 17,
+              color: "#df2d23",
+              fontSize: 25,
+              fontWeight: "bold",
+            }}
+          >
+            !
+          </span>
+        </div>
+
+        <h1
+          style={{
+            fontSize: 21,
+            fontWeight: 400,
+            margin: "0 0 17px",
+          }}
+        >
+          The site ahead contains harmful programs
+        </h1>
+
+        <p
+          style={{
+            fontSize: 14,
+            lineHeight: "23px",
+            margin: 0,
+          }}
+        >
           Attackers on{" "}
-          <span className="redacted">localhost</span>{" "}
-          might attempt to trick you into installing programs that harm
-          your browsing experience (for example, by changing your homepage
-          or showing extra ads on sites you visit).{" "}
-          <a href="#learn">Learn more</a>
+          <span
+            style={{
+              background: "white",
+              color: "white",
+              display: "inline-block",
+              width: 82,
+              height: 15,
+              verticalAlign: "middle",
+            }}
+          >
+            localhost
+          </span>{" "}
+          might attempt to trick you into installing programs that harm your
+          browsing experience (for example, by changing your homepage or
+          showing extra ads on sites you visit).{" "}
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setDetails(true);
+            }}
+            style={{
+              color: "white",
+              textDecoration: "underline",
+            }}
+          >
+            Learn more
+          </a>
         </p>
 
-        {/* Checkbox */}
-        <div className="checkbox-row">
-          <div className="fake-checkbox"></div>
+        {/* CHECKBOX */}
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            marginTop: 32,
+            fontSize: 13,
+            lineHeight: "19px",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            style={{
+              width: 14,
+              height: 14,
+              margin: "1px 7px 0 0",
+            }}
+          />
 
           <span>
             Help improve Safe Browsing by sending some system information and
@@ -333,231 +709,129 @@ function App() {
           </span>
         </div>
 
-        <div className="privacy">
-          <a href="#privacy">Privacy policy</a>
+        <div
+          style={{
+            marginLeft: 21,
+            marginTop: 4,
+            fontSize: 13,
+          }}
+        >
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              alert(
+                "Privacy policy: This is a local cybersecurity training simulation. No information is sent anywhere."
+              );
+            }}
+            style={{
+              color: "white",
+              textDecoration: "underline",
+            }}
+          >
+            Privacy policy
+          </a>
         </div>
 
-        {/* Buttons */}
-        <div className="buttons">
-          <button className="details-button">
+        {/* BUTTONS */}
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 43,
+            width: 503,
+          }}
+        >
+          <button
+            onClick={() => setDetails(true)}
+            style={{
+              color: "white",
+              background: "transparent",
+              border: "1px solid white",
+              borderRadius: 4,
+              padding: "8px 13px",
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
             Details
           </button>
 
           <button
-            className="back-button"
-            onClick={() => {
-              window.location.href = "/";
+            onClick={() => setIncident(false)}
+            style={{
+              color: "#5f6368",
+              background: "white",
+              border: "none",
+              borderRadius: 4,
+              padding: "9px 16px",
+              cursor: "pointer",
+              fontSize: 13,
             }}
           >
             Back to safety
           </button>
         </div>
 
+        {/* DEMO-ONLY CONTROL */}
+
+        <div
+          style={{
+            marginTop: 65,
+            paddingTop: 20,
+            borderTop: "1px solid rgba(255,255,255,.25)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 11,
+              opacity: 0.6,
+              marginBottom: 8,
+            }}
+          >
+            CONTROLLED CYBERSECURITY TRAINING
+          </div>
+
+          <button
+            onClick={() => setUnsafe(true)}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,.5)",
+              color: "white",
+              padding: "7px 11px",
+              borderRadius: 4,
+              cursor: "pointer",
+              fontSize: 11,
+            }}
+          >
+            Simulate unsafe continuation
+          </button>
+        </div>
       </div>
-
-      {/* Demo label - remove before screenshot if desired */}
-      <div className="demo-label">
-        CYBERSECURITY TRAINING DEMO — LOCALHOST
-      </div>
-
-      <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        html,
-        body,
-        #root {
-          margin: 0;
-          width: 100%;
-          height: 100%;
-          font-family: Arial, Helvetica, sans-serif;
-        }
-
-        body {
-          background: #df2d23;
-        }
-
-        .warning-page {
-          min-height: 100vh;
-          width: 100%;
-          background: #df2d23;
-          color: white;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .warning-container {
-          width: 520px;
-          margin-left: calc(50% - 260px);
-          padding-top: 98px;
-        }
-
-        /* Triangle */
-
-        .warning-icon {
-          width: 56px;
-          height: 55px;
-          margin-bottom: 32px;
-          position: relative;
-        }
-
-        .triangle {
-          width: 0;
-          height: 0;
-          border-left: 28px solid transparent;
-          border-right: 28px solid transparent;
-          border-bottom: 49px solid #ffffff;
-          position: relative;
-        }
-
-        .triangle span {
-          position: absolute;
-          left: -4px;
-          top: 17px;
-          color: #df2d23;
-          font-size: 26px;
-          font-weight: bold;
-          line-height: 1;
-        }
-
-        /* Heading */
-
-        h1 {
-          font-size: 21px;
-          font-weight: 400;
-          margin: 0 0 17px 0;
-          line-height: 1.35;
-        }
-
-        /* Description */
-
-        .description {
-          font-size: 14px;
-          line-height: 23px;
-          margin: 0;
-          width: 510px;
-        }
-
-        .description a,
-        .privacy a {
-          color: white;
-          text-decoration: underline;
-          cursor: pointer;
-        }
-
-        /* Simulated redacted hostname */
-
-        .redacted {
-          display: inline-block;
-          width: 82px;
-          height: 15px;
-          background: rgba(255,255,255,0.92);
-          vertical-align: middle;
-          margin: 0 2px;
-          color: transparent;
-          border-radius: 1px;
-        }
-
-        /* Checkbox */
-
-        .checkbox-row {
-          display: flex;
-          align-items: flex-start;
-          margin-top: 32px;
-          font-size: 13px;
-          line-height: 19px;
-          width: 510px;
-        }
-
-        .fake-checkbox {
-          width: 14px;
-          height: 14px;
-          border: 1px solid white;
-          border-radius: 2px;
-          margin-right: 7px;
-          flex-shrink: 0;
-          margin-top: 1px;
-        }
-
-        .privacy {
-          margin-left: 21px;
-          margin-top: 4px;
-          font-size: 13px;
-        }
-
-        /* Buttons */
-
-        .buttons {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 43px;
-          width: 503px;
-        }
-
-        button {
-          font-family: Arial, Helvetica, sans-serif;
-          font-size: 13px;
-          cursor: pointer;
-        }
-
-        .details-button {
-          color: white;
-          background: transparent;
-          border: 1px solid rgba(255,255,255,0.9);
-          border-radius: 4px;
-          padding: 8px 13px;
-        }
-
-        .details-button:hover {
-          background: rgba(255,255,255,0.08);
-        }
-
-        .back-button {
-          color: #5f6368;
-          background: white;
-          border: none;
-          border-radius: 4px;
-          padding: 9px 16px;
-          box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-        }
-
-        .back-button:hover {
-          background: #f5f5f5;
-        }
-
-        /* Training indicator */
-
-        .demo-label {
-          position: fixed;
-          bottom: 12px;
-          right: 16px;
-          font-size: 10px;
-          letter-spacing: 0.7px;
-          color: rgba(255,255,255,0.45);
-        }
-
-        @media (max-width: 700px) {
-          .warning-container {
-            width: calc(100% - 50px);
-            margin-left: 25px;
-            padding-top: 70px;
-          }
-
-          .description,
-          .checkbox-row,
-          .buttons {
-            width: 100%;
-          }
-
-          .buttons {
-            max-width: 503px;
-          }
-        }
-      `}</style>
     </div>
   );
 }
 
-export default App;
+const cellLabel = {
+  padding: "12px 8px",
+  borderBottom: "1px solid #eee",
+  fontWeight: "bold",
+  width: "40%",
+};
+
+const cellValue = {
+  padding: "12px 8px",
+  borderBottom: "1px solid #eee",
+};
+
+const logBox = {
+  background: "#202124",
+  color: "#e8eaed",
+  padding: 18,
+  borderRadius: 6,
+  fontFamily: "monospace",
+  fontSize: 13,
+  lineHeight: 2,
+};
